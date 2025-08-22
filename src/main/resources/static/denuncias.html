@@ -47,5 +47,14 @@
 <footer>
     <p>Todos los Derechos Reservados 2025 &copy;</p>
 </footer>
+<script>
+    // Lógica para cerrar sesión
+    document.querySelector(".logout .btn-red").addEventListener("click", function() {
+        localStorage.clear(); // Opcional
+        sessionStorage.clear(); // Opcional
+        window.location.href = "index.html";
+    });
+</script>
+
 </body>
 </html>
