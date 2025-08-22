@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleados - RRHH</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <p>SISTEMA DE RRHH</p>
+    <nav>
+        <a href="agregar.html">Agregar Personal</a>
+        <a href="denuncias.html">Denuncias</a>
+    </nav>
+</header>
+
+<main>
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Buscar empleado...">
+    </div>
+
+    <!-- Listado de empleados dinámico -->
+    <div id="empleados-list"></div>
+
+    <div class="bottom-right">
+        <a href="agregar.html" class="btn">Agregar Empleado</a>
+    </div>
+</main>
+
+<div class="logout">
+    <button class="btn btn-red">Cerrar Sesión</button>
+</div>
+
+<footer>
+    <p>Todos los Derechos Reservados 2025 &copy;</p>
+</footer>
+
+<script>
+    // Función para renderizar los empleados en el HTML
+    function renderEmpleados(empleados) {
+        const contenedor = document.getElementById("empleados-list");
+        contenedor.innerHTML = ""; // Limpiar lista previa
+
+        empleados.forEach(emp => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+
+            card.innerHTML = `
+                <div>
+                    <strong>${emp.nombre}</strong><br>
+                    Área: ${emp.area} | Inicio: ${emp.fechaInicio} | Edad: ${emp.edad}
+                </div>
+                <div class="edit">✏️</div>
+            `;
+
+            contenedor.appendChild(card);
+        });
+    }
+
+    // Traer empleados desde el backend
+    fetch("http://localhost:8080/api/empleados")
+        .then(response => response.json())
+        .then(data => renderEmpleados(data))
+        .catch(error => console.error("Error cargando empleados:", error));
+
+    // Búsqueda en vivo
+    document.getElementById("searchInput").addEventListener("input", function() {
+        const filtro = this.value.toLowerCase();
+        const empleados = document.querySelectorAll(".card");
+
+        empleados.forEach(card => {
+            const texto = card.innerText.toLowerCase();
+            card.style.display = texto.includes(filtro) ? "" : "none";
+        });
+    });
+</script>
+</body>
+</html>

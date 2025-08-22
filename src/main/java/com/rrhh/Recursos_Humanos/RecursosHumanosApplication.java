@@ -24,7 +24,7 @@ public class RecursosHumanosApplication {
 			if (usuarioRepository.findByUsername("admin").isEmpty()) {
 				Usuario admin = new Usuario();
 				admin.setUsername("admin");
-				admin.setPassword(encoder.encode("1234")); // encriptar la contraseña
+				admin.setPassword("1234"); // encriptar la contraseña
 				admin.setRoles(Set.of("ADMIN")); // rol ADMIN
 				usuarioRepository.save(admin);
 				System.out.println("Usuario admin creado con éxito!");

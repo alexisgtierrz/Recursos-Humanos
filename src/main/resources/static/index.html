@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE RRHH</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <p>SISTEMA DE RRHH</p>
+</header>
+
+<main class="login-container">
+    <div class="login-box">
+        <h2>Iniciar Sesión</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="usuario">Usuario</label>
+                <input type="text" id="usuario" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn">Ingresar</button>
+        </form>
+        <p id="error-msg" style="color:red; display:none;">Usuario o contraseña incorrectos</p>
+    </div>
+</main>
+
+<footer>
+    <p>Todos los Derechos Reservados 2025 &copy;</p>
+</footer>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const usuario = document.getElementById("usuario").value;
+        const password = document.getElementById("password").value;
+
+        try {
+            const response = await fetch("http://localhost:8080/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ usuario, password })
+            });
+
+            if (response.ok) {
+                // ✅ Login correcto → redirigir a empleados.html
+                window.location.href = "empleados.html";
+            } else {
+                // ❌ Login fallido → mostrar mensaje
+                document.getElementById("error-msg").style.display = "block";
+            }
+        } catch (error) {
+            console.error("Error al conectar con el servidor:", error);
+            document.getElementById("error-msg").innerText = "Error de conexión con el servidor";
+            document.getElementById("error-msg").style.display = "block";
+        }
+    });
+</script>
+</body>
+</html>

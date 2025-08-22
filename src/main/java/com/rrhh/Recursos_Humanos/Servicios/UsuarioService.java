@@ -25,5 +25,11 @@ public class UsuarioService implements UserDetailsService {
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
     }
+
+    public boolean validarCredenciales(String usuario, String password) {
+        return usuarioRepository.findByUsername(usuario)
+                .map(u -> u.getPassword().equals(password))
+                .orElse(false);
+    }
 }
 
