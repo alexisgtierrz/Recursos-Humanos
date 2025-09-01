@@ -1,3 +1,4 @@
+// Corrected code for SeguridadConfig.java
 package com.rrhh.Recursos_Humanos.Config;
 
 import com.rrhh.Recursos_Humanos.Servicios.UsuarioService;
@@ -8,19 +9,23 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class SeguridadConfig {
 
     private final UsuarioService usuarioService;
+    private final PasswordEncoder passwordEncoder;
 
-    public SeguridadConfig(UsuarioService usuarioService) {
+    public SeguridadConfig(UsuarioService usuarioService, PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -28,7 +33,7 @@ public class SeguridadConfig {
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(usuarioService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
@@ -41,12 +46,11 @@ public class SeguridadConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/empleados/**").hasRole("ADMIN") // solo ADMIN maneja CRUD
+                        .requestMatchers("/api/empleados/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .httpBasic();
+                .httpBasic(withDefaults());
 
         return http.build();
     }
 }
-
