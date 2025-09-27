@@ -26,7 +26,7 @@ public class AuthController {
     }
 
     @Autowired
-    private UsuarioService usuarioService;
+    public UsuarioService usuarioService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
