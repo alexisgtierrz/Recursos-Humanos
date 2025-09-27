@@ -1,6 +1,10 @@
 package com.rrhh.Recursos_Humanos.Modelos;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+
 import java.util.Set;
 
 @Entity
@@ -11,12 +15,23 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre de usuario no puede estar vacío")
+    @Size(min = 3, max = 20, message = "El nombre de usuario debe tener entre 3 y 20 caracteres")
+    @Pattern(regexp = "^[A-Za-z0-9_.]+$", message = "El nombre de usuario solo puede contener letras, números, guiones bajos o puntos")
     private String username;
+
+    @NotBlank(message = "La contraseña no puede estar vacía")
+    @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+// opcional: patrón de complejidad
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
+            message = "La contraseña debe contener mayúsculas, minúsculas y números")
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "roles", joinColumns = @JoinColumn(name = "usuario_id"))
     @Column(name = "rol")
+    @NotNull(message = "El conjunto de roles no puede ser nulo")
+    @Size(min = 1, message = "Debe asignarse al menos un rol")
     private Set<String> roles;
 
     public Usuario() {}
