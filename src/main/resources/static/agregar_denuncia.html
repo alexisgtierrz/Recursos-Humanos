@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Personal - RRHH</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <p>SISTEMA DE RRHH</p>
+    <nav>
+        <a href="empleados.html">Lista Empleados</a>
+        <a href="denuncias.html">Denuncias</a>
+    </nav>
+</header>
+
+<main>
+    <div class="form-container">
+        <h2>Agregar Denuncias</h2>
+        <form>
+            <label for="opciones">Puesto </label>
+
+            <select id="opciones">
+                <option value="" disabled selected>--Seleccione--</option>
+                <option value="empleado">Empleados</option>
+                <option value="empleado">Empleados</option>
+            </select>
+
+            <label for="opciones">Empleados </label>
+
+            <select id="opciones">
+                <option value="" disabled selected>--Seleccione--</option>
+                <option value="empleado">Empleados</option>
+                <option value="empleado">Empleados</option>
+            </select>
+
+            <div class="form-group">
+                <label for="mensaje">Motivo:</label>
+                <textarea id="mensaje"></textarea>
+            </div>
+
+            <label for="opciones">Sancion </label>
+
+            <select id="opciones">
+                <option value="" disabled selected>--Seleccione--</option>
+                <option value="empleado">Sancion</option>
+                <option value="empleado">Empleados</option>
+            </select>
+
+            <div class="form-actions">
+                <a href="denuncias.html" class="btn">Guardar</a>
+                <a href="denuncias.html" class="btn btn-red">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+
+
+<footer>
+    <p>Todos los Derechos Reservados 2025 &copy;</p>
+</footer>
+<script>
+    // Lógica para cerrar sesión
+    document.querySelector(".logout .btn-red").addEventListener("click", function() {
+        localStorage.clear(); // Opcional
+        sessionStorage.clear(); // Opcional
+        window.location.href = "index.html";
+    });
+</script>
+</body>
+</html>

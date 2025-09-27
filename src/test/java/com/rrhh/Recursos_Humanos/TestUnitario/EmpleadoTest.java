@@ -26,24 +26,6 @@ class EmpleadoTest {
         assertNotNull(empleado);
     }
 
-    @Test
-    void testConstructorConParametros() {
-        Empleado empleado = new Empleado(
-                "Juan",
-                "Pérez",
-                "juan.perez@example.com",
-                "123456789",
-                "Desarrollador",
-                50000.0
-        );
-
-        assertEquals("Juan", empleado.getNombre());
-        assertEquals("Pérez", empleado.getApellido());
-        assertEquals("juan.perez@example.com", empleado.getEmail());
-        assertEquals("123456789", empleado.getTelefono());
-        assertEquals("Desarrollador", empleado.getPuesto());
-        assertEquals(50000.0, empleado.getSalario());
-    }
 
     @Test
     void testGettersYSetters() {
@@ -54,7 +36,6 @@ class EmpleadoTest {
         empleado.setApellido("García");
         empleado.setEmail("ana.garcia@example.com");
         empleado.setTelefono("987654321");
-        empleado.setPuesto("Analista");
         empleado.setSalario(60000.0);
 
         assertEquals(1L, empleado.getId());
@@ -74,7 +55,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890"); // 10 dígitos
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -92,7 +72,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -114,7 +93,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -136,7 +114,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -160,7 +137,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez123");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -182,7 +158,6 @@ class EmpleadoTest {
         empleado.setApellido("Pé rez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -204,7 +179,6 @@ class EmpleadoTest {
         empleado.setApellido("Pé_rez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -226,7 +200,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez123");
         empleado.setEmail("juan.perezexample.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -248,7 +221,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("a234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -270,7 +242,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador1");
         empleado.setSalario(50000.0);
 
         // Act
@@ -292,7 +263,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarro llador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -314,7 +284,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desa_rrollador");
         empleado.setSalario(50000.0);
 
         // Act
@@ -336,7 +305,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(null); // Salario inválido
 
         // Act
@@ -357,7 +325,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(0.0); // Salario inválido
 
         // Act
@@ -378,7 +345,6 @@ class EmpleadoTest {
         empleado.setApellido("Pérez");
         empleado.setEmail("juan.perez@example.com");
         empleado.setTelefono("1234567890");
-        empleado.setPuesto("Desarrollador");
         empleado.setSalario(1000.123); // Más de 2 decimales
 
         // Act

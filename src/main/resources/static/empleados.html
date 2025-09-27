@@ -24,7 +24,7 @@
     <div id="empleados-list"></div>
 
     <div class="bottom-right">
-        <a href="agregar.html" class="btn">Agregar Empleado</a>
+        <a href="agregar_empleado.html" class="btn">Agregar Empleado</a>
     </div>
 </main>
 
@@ -37,10 +37,22 @@
 </footer>
 
 <script>
-    // Función para renderizar los empleados en el HTML
+    // Función para traer empleados desde el backend
+    function fetchEmpleados() {
+        fetch("http://localhost:8080/api/empleados", {
+            headers: {
+                "Authorization": "Basic " + btoa("admin:Password123") // reemplaza por tus credenciales
+            }
+        })
+            .then(res => res.json())
+            .then(data => renderEmpleados(data))
+            .catch(err => console.error("Error cargando empleados:", err));
+    }
+
+    // Función para renderizar los empleados en la página
     function renderEmpleados(empleados) {
         const contenedor = document.getElementById("empleados-list");
-        contenedor.innerHTML = ""; // Limpiar lista previa
+        contenedor.innerHTML = ""; // limpiar lista previa
 
         empleados.forEach(emp => {
             const card = document.createElement("div");
@@ -48,28 +60,62 @@
 
             card.innerHTML = `
                 <div>
-                    <strong>${emp.nombre}</strong><br>
-                    Área: ${emp.area} | Inicio: ${emp.fechaInicio} | Edad: ${emp.edad}
+                    <strong>${emp.nombre} ${emp.apellido}</strong><br>
+                    DNI: ${emp.dni}<br>
+                    Fecha Nacimiento: ${emp.fechaNacimiento}<br>
+                    Email: ${emp.email}<br>
+                    Teléfono: ${emp.telefono}<br>
+                    Puesto: ${emp.puesto ? emp.puesto.nombre : "Sin asignar"}<br>
+                    Salario: $${emp.salario}
                 </div>
-                <div class="edit">✏️</div>
+                <div class="actions">
+                    <button class="editar" data-id="${emp.id}">✏️</button>
+                    <button class="eliminar" data-id="${emp.id}">🗑️</button>
+                </div>
             `;
 
             contenedor.appendChild(card);
         });
-    }
 
-    // Traer empleados desde el backend
-    fetch("http://localhost:8080/api/empleados")
-        .then(response => response.json())
-        .then(data => renderEmpleados(data))
-        .catch(error => console.error("Error cargando empleados:", error));
+        document.querySelectorAll(".editar").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const id = this.getAttribute("data-id");
+                sessionStorage.setItem("editarEmpleadoId", id);
+                window.location.href = "agregar_empleado.html";
+            });
+        });
+
+        // Asignar eventos de eliminar
+        document.querySelectorAll(".eliminar").forEach(btn => {
+            btn.addEventListener("click", async function() {
+                const id = this.getAttribute("data-id");
+                if (confirm("¿Seguro que quieres eliminar este empleado?")) {
+                    try {
+                        const response = await fetch(`http://localhost:8080/api/empleados/${id}`, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": "Basic " + btoa("admin:Password123")
+                            }
+                        });
+                        if (response.ok) {
+                            alert("Empleado eliminado correctamente ✅");
+                            fetchEmpleados();
+                        } else {
+                            alert("Error al eliminar el empleado");
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        alert("No se pudo conectar con el servidor.");
+                    }
+                }
+            });
+        });
+    }
 
     // Búsqueda en vivo
     document.getElementById("searchInput").addEventListener("input", function() {
         const filtro = this.value.toLowerCase();
-        const empleados = document.querySelectorAll(".card");
-
-        empleados.forEach(card => {
+        document.querySelectorAll(".card").forEach(card => {
             const texto = card.innerText.toLowerCase();
             card.style.display = texto.includes(filtro) ? "" : "none";
         });
@@ -77,10 +123,13 @@
 
     // Lógica para cerrar sesión
     document.querySelector(".logout .btn-red").addEventListener("click", function() {
-        localStorage.clear(); // Opcional
-        sessionStorage.clear(); // Opcional
+        localStorage.clear();
+        sessionStorage.clear();
         window.location.href = "index.html";
     });
+
+    // Llamada inicial
+    fetchEmpleados();
 </script>
 </body>
 </html>

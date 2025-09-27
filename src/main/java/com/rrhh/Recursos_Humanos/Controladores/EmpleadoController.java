@@ -41,6 +41,8 @@ public class EmpleadoController {
                 .map(e -> {
                     e.setNombre(empleado.getNombre());
                     e.setApellido(empleado.getApellido());
+                    e.setDni(empleado.getDni());
+                    e.setFechaNacimiento(empleado.getFechaNacimiento());
                     e.setEmail(empleado.getEmail());
                     e.setTelefono(empleado.getTelefono());
                     e.setPuesto(empleado.getPuesto());
