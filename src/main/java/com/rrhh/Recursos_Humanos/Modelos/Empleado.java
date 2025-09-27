@@ -45,7 +45,6 @@ public class Empleado {
 
     @NotNull(message = "El salario no puede estar vacío")
     @DecimalMin(value = "0.0", inclusive = false, message = "El salario debe ser mayor que 0")
-    @Digits(integer = 10, fraction = 2, message = "El salario debe tener hasta 10 dígitos enteros y 2 decimales")
     private Double salario;
 
     // Constructores
