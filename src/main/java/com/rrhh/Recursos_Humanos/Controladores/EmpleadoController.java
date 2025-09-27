@@ -2,6 +2,7 @@ package com.rrhh.Recursos_Humanos.Controladores;
 
 import com.rrhh.Recursos_Humanos.Modelos.Empleado;
 import com.rrhh.Recursos_Humanos.Servicios.EmpleadoService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ public class EmpleadoController {
     }
 
     @PostMapping
-    public Empleado guardarEmpleado(@RequestBody Empleado empleado) {
+    public Empleado guardarEmpleado(@Valid @RequestBody Empleado empleado) {
         return empleadoService.guardarEmpleado(empleado);
     }
 

@@ -1,0 +1,24 @@
+package com.rrhh.Recursos_Humanos.Controladores;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    // Maneja errores de validación de @RequestBody con @Valid
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
+        // Tomamos solo el primer error
+        String mensaje = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getDefaultMessage())
+                .findFirst()
+                .orElse("Error de validación");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mensaje);
+    }
+}
