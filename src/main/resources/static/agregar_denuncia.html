@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Personal - RRHH</title>
+    <title>Agregar Denuncia - RRHH</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -17,57 +17,110 @@
 
 <main>
     <div class="form-container">
-        <h2>Agregar Denuncias</h2>
-        <form>
-            <label for="opciones">Puesto </label>
-
-            <select id="opciones">
+        <h2>Agregar Denuncia</h2>
+        <form id="denunciaForm">
+            <!-- Puestos -->
+            <label for="puestos">Puesto</label>
+            <select id="puestos" required>
                 <option value="" disabled selected>--Seleccione--</option>
-                <option value="empleado">Empleados</option>
-                <option value="empleado">Empleados</option>
             </select>
 
-            <label for="opciones">Empleados </label>
-
-            <select id="opciones">
+            <!-- Empleados filtrados por puesto -->
+            <label for="empleados">Empleados</label>
+            <select id="empleados" required>
                 <option value="" disabled selected>--Seleccione--</option>
-                <option value="empleado">Empleados</option>
-                <option value="empleado">Empleados</option>
             </select>
 
+            <!-- Motivo -->
             <div class="form-group">
-                <label for="mensaje">Motivo:</label>
-                <textarea id="mensaje"></textarea>
+                <label for="motivo">Motivo:</label>
+                <textarea id="motivo" required></textarea>
             </div>
 
-            <label for="opciones">Sancion </label>
-
-            <select id="opciones">
-                <option value="" disabled selected>--Seleccione--</option>
-                <option value="empleado">Sancion</option>
-                <option value="empleado">Empleados</option>
-            </select>
-
+            <!-- Botones -->
             <div class="form-actions">
-                <a href="denuncias.html" class="btn">Guardar</a>
+                <button type="submit" class="btn">Guardar</button>
                 <a href="denuncias.html" class="btn btn-red">Cancelar</a>
             </div>
         </form>
     </div>
 </main>
 
-
-
 <footer>
     <p>Todos los Derechos Reservados 2025 &copy;</p>
 </footer>
+
 <script>
-    // Lógica para cerrar sesión
-    document.querySelector(".logout .btn-red").addEventListener("click", function() {
-        localStorage.clear(); // Opcional
-        sessionStorage.clear(); // Opcional
-        window.location.href = "index.html";
+    const puestosSelect = document.getElementById("puestos");
+    const empleadosSelect = document.getElementById("empleados");
+    const form = document.getElementById("denunciaForm");
+
+    // Traer puestos desde el backend
+    async function fetchPuestos() {
+        try {
+            const res = await fetch("http://localhost:8080/api/puestos");
+            const puestos = await res.json();
+            puestos.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p.id;
+                option.textContent = p.nombre;
+                puestosSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error cargando puestos:", error);
+        }
+    }
+
+    // Traer empleados filtrados por puesto
+    async function fetchEmpleados(puestoId) {
+        try {
+            empleadosSelect.innerHTML = '<option value="" disabled selected>--Seleccione--</option>';
+            const res = await fetch(`http://localhost:8080/api/empleados/puesto/${puestoId}`);
+            const empleados = await res.json();
+            empleados.forEach(e => {
+                const option = document.createElement("option");
+                option.value = e.id;
+                option.textContent = `${e.nombre} ${e.apellido}`;
+                empleadosSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error cargando empleados:", error);
+        }
+    }
+
+    // Evento cambio de puesto
+    puestosSelect.addEventListener("change", (e) => {
+        const puestoId = e.target.value;
+        if (puestoId) fetchEmpleados(puestoId);
     });
+
+    // Enviar formulario
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const empleadoId = empleadosSelect.value;
+        const descripcion = document.getElementById("motivo").value;
+
+        try {
+            const res = await fetch(`http://localhost:8080/api/denuncias/empleado/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ descripcion})
+            });
+            if (res.ok) {
+                alert("Denuncia agregada correctamente");
+                window.location.href = "denuncias.html";
+            } else {
+                alert("Error al agregar denuncia");
+            }
+        } catch (error) {
+            console.error("Error al guardar denuncia:", error);
+        }
+    });
+
+    // Inicialización
+    fetchPuestos();
 </script>
 </body>
 </html>

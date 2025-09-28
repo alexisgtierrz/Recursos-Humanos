@@ -18,22 +18,8 @@
 <main>
     <h2>Listado de Denuncias</h2>
 
-    <!-- Ejemplo (esto vendrá desde la base de datos) -->
-    <div class="card">
-        <div>
-            <strong>Juan Pérez</strong><br>
-            Motivo: Llegadas tarde reiteradas <br>
-            Sanción: Apercibimiento
-        </div>
-    </div>
-
-    <div class="card">
-        <div>
-            <strong>María López</strong><br>
-            Motivo: Ausencia injustificada <br>
-            Sanción: Descuento salarial
-        </div>
-    </div>
+    <!-- Contenedor dinámico para denuncias -->
+    <div id="denuncias-list"></div>
 
     <div class="bottom-right">
         <a href="agregar_denuncia.html" class="btn">Agregar Denuncia</a>
@@ -47,11 +33,94 @@
 <footer>
     <p>Todos los Derechos Reservados 2025 &copy;</p>
 </footer>
+
 <script>
-    // Lógica para cerrar sesión
+    const denunciasList = document.getElementById("denuncias-list");
+
+    // Traer denuncias desde el backend
+    async function fetchDenuncias() {
+        try {
+            const response = await fetch("http://localhost:8080/api/denuncias", {
+                headers: {
+                    "Authorization": "Basic " + btoa("admin:Password123")
+                }
+            });
+            const denuncias = await response.json();
+            renderDenuncias(Array.isArray(denuncias) ? denuncias : []);
+        } catch (error) {
+            console.error("Error cargando denuncias:", error);
+            denunciasList.innerHTML = "<p>No se pudieron cargar las denuncias.</p>";
+        }
+    }
+
+    // Función para eliminar denuncia
+    async function eliminarDenuncia(id) {
+        if (!confirm("¿Seguro que quieres eliminar esta denuncia?")) return;
+
+        try {
+            const res = await fetch(`http://localhost:8080/api/denuncias/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Basic " + btoa("admin:Password123")
+                }
+            });
+            if (res.ok) {
+                alert("Denuncia eliminada correctamente ✅");
+                fetchDenuncias();
+            } else {
+                alert("Error al eliminar denuncia");
+            }
+        } catch (error) {
+            console.error("Error al eliminar denuncia:", error);
+        }
+    }
+
+    // Renderizar denuncias
+    function renderDenuncias(denuncias) {
+        denunciasList.innerHTML = "";
+
+        if (!denuncias.length) {
+            denunciasList.innerHTML = "<p>No hay denuncias registradas.</p>";
+            return;
+        }
+
+        denuncias.forEach(d => {
+            const empleadoNombre = d.empleado ? `${d.empleado.nombre} ${d.empleado.apellido}` : "Empleado desconocido";
+            const fecha = d.fecha ? new Date(d.fecha).toLocaleDateString() : "Fecha no disponible";
+
+            const card = document.createElement("div");
+            card.classList.add("card");
+
+            card.innerHTML = `
+            <div>
+                <strong>${empleadoNombre}</strong><br>
+                Motivo: ${d.descripcion} <br>
+                Fecha: ${fecha}
+            </div>
+            <div class="actions">
+                <button class="eliminar" data-id="${d.id}">🗑️</button>
+            </div>
+        `;
+
+            denunciasList.appendChild(card);
+        });
+
+        // Asignar evento eliminar
+        document.querySelectorAll(".eliminar").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const id = this.getAttribute("data-id");
+                eliminarDenuncia(id);
+            });
+        });
+    }
+
+    // Inicializar
+    fetchDenuncias();
+
+    // Cerrar sesión
     document.querySelector(".logout .btn-red").addEventListener("click", function() {
-        localStorage.clear(); // Opcional
-        sessionStorage.clear(); // Opcional
+        localStorage.clear();
+        sessionStorage.clear();
         window.location.href = "index.html";
     });
 </script>

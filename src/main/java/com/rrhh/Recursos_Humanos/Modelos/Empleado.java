@@ -1,7 +1,11 @@
 package com.rrhh.Recursos_Humanos.Modelos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "empleados")
@@ -59,6 +63,10 @@ public class Empleado {
     @DecimalMin(value = "0.0", inclusive = false, message = "El salario debe ser mayor que 0")
     private Double salario;
 
+    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Denuncia> denuncias = new ArrayList<>();
+
     // Constructores
     public Empleado() {}
 
@@ -98,5 +106,19 @@ public class Empleado {
 
     public Double getSalario() { return salario; }
     public void setSalario(Double salario) { this.salario = salario; }
+
+    public List<Denuncia> getDenuncias() { return denuncias; }
+    public void setDenuncias(List<Denuncia> denuncias) { this.denuncias = denuncias; }
+
+    // 🔹 Helper para añadir denuncias
+    public void addDenuncia(Denuncia denuncia) {
+        denuncias.add(denuncia);
+        denuncia.setEmpleado(this);
+    }
+
+    public void removeDenuncia(Denuncia denuncia) {
+        denuncias.remove(denuncia);
+        denuncia.setEmpleado(null);
+    }
 }
 

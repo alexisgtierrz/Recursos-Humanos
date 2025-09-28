@@ -61,4 +61,9 @@ public class EmpleadoController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/puesto/{puestoId}")
+    public List<Empleado> obtenerEmpleadosPorPuesto(@PathVariable Long puestoId) {
+        return empleadoService.obtenerPorPuesto(puestoId);
+    }
 }

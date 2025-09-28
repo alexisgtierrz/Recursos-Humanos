@@ -32,5 +32,9 @@ public class EmpleadoService {
     public void eliminarEmpleado(Long id) {
         empleadoRepository.deleteById(id);
     }
+
+    public List<Empleado> obtenerPorPuesto(Long puestoId) {
+        return empleadoRepository.findByPuestoId(puestoId);
+    }
 }
 
