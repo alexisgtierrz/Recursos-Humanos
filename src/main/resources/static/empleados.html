@@ -24,7 +24,7 @@
     <div id="empleados-list"></div>
 
     <div class="bottom-right">
-        <a href="agregar_empleado.html" class="btn">Agregar Empleado</a>
+        <a href="agregar_empleado.html" class="btn" id="btnAgregar">Agregar Empleado</a>
     </div>
 </main>
 
@@ -37,6 +37,8 @@
 </footer>
 
 <script>
+    let empleadosGlobal = []; // 🔹 Guardamos todos los empleados aquí
+
     // Función para traer empleados desde el backend
     function fetchEmpleados() {
         fetch("http://localhost:8080/api/empleados", {
@@ -45,14 +47,22 @@
             }
         })
             .then(res => res.json())
-            .then(data => renderEmpleados(data))
+            .then(data => {
+                empleadosGlobal = data; // guardamos los empleados
+                renderEmpleados(data); // renderizamos
+            })
             .catch(err => console.error("Error cargando empleados:", err));
     }
 
-    // Función para renderizar los empleados en la página
+    // Función para renderizar empleados en la página
     function renderEmpleados(empleados) {
         const contenedor = document.getElementById("empleados-list");
         contenedor.innerHTML = ""; // limpiar lista previa
+
+        if (empleados.length === 0) {
+            contenedor.innerHTML = "<p>No se encontraron empleados.</p>";
+            return;
+        }
 
         empleados.forEach(emp => {
             const card = document.createElement("div");
@@ -77,6 +87,7 @@
             contenedor.appendChild(card);
         });
 
+        // Eventos editar
         document.querySelectorAll(".editar").forEach(btn => {
             btn.addEventListener("click", function() {
                 const id = this.getAttribute("data-id");
@@ -85,7 +96,7 @@
             });
         });
 
-        // Asignar eventos de eliminar
+        // Eventos eliminar
         document.querySelectorAll(".eliminar").forEach(btn => {
             btn.addEventListener("click", async function() {
                 const id = this.getAttribute("data-id");
@@ -112,21 +123,29 @@
         });
     }
 
-    // Búsqueda en vivo
+    // 🔹 Búsqueda en vivo (ahora filtra la lista global y re-renderiza)
     document.getElementById("searchInput").addEventListener("input", function() {
         const filtro = this.value.toLowerCase();
-        document.querySelectorAll(".card").forEach(card => {
-            const texto = card.innerText.toLowerCase();
-            card.style.display = texto.includes(filtro) ? "" : "none";
-        });
+        const filtrados = empleadosGlobal.filter(emp =>
+            `${emp.nombre} ${emp.apellido}`.toLowerCase().includes(filtro)
+        );
+        renderEmpleados(filtrados);
     });
 
-    // Lógica para cerrar sesión
+    // Cerrar sesión
     document.querySelector(".logout .btn-red").addEventListener("click", function() {
         localStorage.clear();
         sessionStorage.clear();
         window.location.href = "index.html";
     });
+
+    // 🔹 Limpiar sessionStorage si presiono "Agregar Empleado"
+    const btnAgregar = document.getElementById("btnAgregar");
+    if (btnAgregar) {
+        btnAgregar.addEventListener("click", () => {
+            sessionStorage.removeItem("editarEmpleadoId");
+        });
+    }
 
     // Llamada inicial
     fetchEmpleados();

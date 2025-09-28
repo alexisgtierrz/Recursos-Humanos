@@ -34,7 +34,7 @@
             </div>
             <div class="form-group">
                 <label>Fecha de Nacimiento</label>
-                <input type="text" id="fechaNacimiento" placeholder="dd/MM/yyyy" required>
+                <input type="text" id="fechaNacimiento" placeholder="dd/MM/yyyy" maxlength="10" required>
             </div>
             <div class="form-group">
                 <label>E-Mail</label>
@@ -69,6 +69,18 @@
 </footer>
 
 <script>
+    // ----------- AUTOCOMPLETAR FECHA CON SLASHES -----------
+    const fechaInput = document.getElementById("fechaNacimiento");
+    fechaInput.addEventListener("input", (e) => {
+        let value = e.target.value.replace(/\D/g, ""); // quitar no numéricos
+        if (value.length > 2 && value.length <= 4) {
+            value = value.slice(0,2) + "/" + value.slice(2);
+        } else if (value.length > 4) {
+            value = value.slice(0,2) + "/" + value.slice(2,4) + "/" + value.slice(4,8);
+        }
+        e.target.value = value;
+    });
+
     // Obtener empleado a editar desde sessionStorage
     let empleadoId = sessionStorage.getItem("editarEmpleadoId");
 
