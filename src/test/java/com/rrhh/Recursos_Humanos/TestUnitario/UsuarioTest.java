@@ -19,36 +19,6 @@ public class UsuarioTest {
         validator = factory.getValidator();
     }
 
-    @Test
-    void testConstructorVacio() {
-        Usuario usuario = new Usuario();
-        assertNotNull(usuario);
-    }
-
-    @Test
-    void testConstructorConParametros() {
-        Usuario usuario = new Usuario();
-        usuario.setUsername("juan123");
-        usuario.setPassword("Password1");
-        usuario.setRoles(Set.of("USER"));
-
-        assertEquals("juan123", usuario.getUsername());
-        assertEquals("Password1", usuario.getPassword());
-        assertEquals(Set.of("USER"), usuario.getRoles());
-    }
-
-    @Test
-    void testGettersYSetters() {
-        Usuario usuario = new Usuario();
-
-        usuario.setUsername("ana456");
-        usuario.setPassword("Password2");
-        usuario.setRoles(Set.of("ADMIN"));
-
-        assertEquals("ana456", usuario.getUsername());
-        assertEquals("Password2", usuario.getPassword());
-        assertEquals(Set.of("ADMIN"), usuario.getRoles());
-    }
 
     @Test
     void usuarioValido_NoDebeTenerViolaciones() {

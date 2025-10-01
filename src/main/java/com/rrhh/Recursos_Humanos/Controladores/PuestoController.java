@@ -22,11 +22,13 @@ public class PuestoController {
         this.puestoService = puestoService;
     }
 
+    //Listar puestos
     @GetMapping
     public List<Puesto> listarPuestos() {
         return puestoRepository.findAll();
     }
 
+    //Crear puesto
     @PostMapping
     public Puesto guardarPuesto(@Valid @RequestBody Puesto puesto) {
         return puestoService.guardarPuesto(puesto);

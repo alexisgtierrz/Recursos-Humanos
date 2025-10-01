@@ -15,6 +15,7 @@ public class DenunciaController {
     @Autowired
     private DenunciaService denunciaService;
 
+    // Listar denuncias
     @GetMapping
     public List<Denuncia> listarDenuncias() {
         return denunciaService.obtenerTodas();

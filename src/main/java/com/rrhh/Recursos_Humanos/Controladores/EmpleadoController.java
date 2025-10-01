@@ -18,11 +18,13 @@ public class EmpleadoController {
         this.empleadoService = empleadoService;
     }
 
+    // Listar empleados
     @GetMapping
     public List<Empleado> listarEmpleados() {
         return empleadoService.listarEmpleados();
     }
 
+    // Buscar empleado por id
     @GetMapping("/{id}")
     public ResponseEntity<Empleado> obtenerEmpleadoPorId(@PathVariable Long id) {
         return empleadoService.obtenerEmpleadoPorId(id)
@@ -30,11 +32,13 @@ public class EmpleadoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    //Crear empleado
     @PostMapping
     public Empleado guardarEmpleado(@Valid @RequestBody Empleado empleado) {
         return empleadoService.guardarEmpleado(empleado);
     }
 
+    // Editar empleado
     @PutMapping("/{id}")
     public ResponseEntity<Empleado> actualizarEmpleado(@PathVariable Long id, @RequestBody Empleado empleado) {
         return empleadoService.obtenerEmpleadoPorId(id)
@@ -52,6 +56,7 @@ public class EmpleadoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    //Editar empleado
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEmpleado(@PathVariable Long id) {
         return empleadoService.obtenerEmpleadoPorId(id)
@@ -62,6 +67,7 @@ public class EmpleadoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    //Buscar empleado por puesto
     @GetMapping("/puesto/{puestoId}")
     public List<Empleado> obtenerEmpleadosPorPuesto(@PathVariable Long puestoId) {
         return empleadoService.obtenerPorPuesto(puestoId);

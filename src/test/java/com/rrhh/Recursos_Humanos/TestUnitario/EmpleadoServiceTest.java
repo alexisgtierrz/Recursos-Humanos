@@ -2,6 +2,7 @@ package com.rrhh.Recursos_Humanos.TestUnitario;
 
 
 import com.rrhh.Recursos_Humanos.Modelos.Empleado;
+import com.rrhh.Recursos_Humanos.Modelos.Puesto;
 import com.rrhh.Recursos_Humanos.Repositorios.EmpleadoRepository;
 import com.rrhh.Recursos_Humanos.Servicios.EmpleadoService;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,12 +26,21 @@ public class EmpleadoServiceTest {
         empleadoService = new EmpleadoService(empleadoRepository);
     }
 
-    /*
+
     @Test
     void listarEmpleados_DeberiaRetornarLista() {
         // Arrange
-        Empleado empleado1 = new Empleado("Juan", "Pérez", "juan.perez@example.com", "1234567890", , 50000.0);
-        Empleado empleado2 = new Empleado("Ana", "García", "ana.garcia@example.com", "0987654321", , 60000.0);
+        Puesto puesto1 = new Puesto();
+        puesto1.setId(1L);
+        puesto1.setNombre("Desarrollador Backend");
+
+        Puesto puesto2 = new Puesto();
+        puesto2.setId(2L);
+        puesto2.setNombre("Desarrollador Frontend");
+
+        Empleado empleado1 = new Empleado("Juan", "Pérez", "juan.perez@example.com", "1234567890", puesto1, 50000.0);
+        Empleado empleado2 = new Empleado("Ana", "García", "ana.garcia@example.com", "0987654321", puesto2, 60000.0);
+
         when(empleadoRepository.findAll()).thenReturn(List.of(empleado1, empleado2));
 
         // Act
@@ -46,7 +56,11 @@ public class EmpleadoServiceTest {
     @Test
     void obtenerEmpleadoPorId_DeberiaRetornarEmpleado() {
         // Arrange
-        Empleado empleado = new Empleado("Juan", "Pérez", "juan.perez@example.com", "1234567890", "Desarrollador", 50000.0);
+        Puesto puesto = new Puesto();
+        puesto.setId(1L);
+        puesto.setNombre("Desarrollador");
+
+        Empleado empleado = new Empleado("Juan", "Pérez", "juan.perez@example.com", "1234567890", puesto, 50000.0);
         when(empleadoRepository.findById(1L)).thenReturn(Optional.of(empleado));
 
         // Act
@@ -55,13 +69,18 @@ public class EmpleadoServiceTest {
         // Assert
         assertTrue(resultado.isPresent());
         assertEquals("Juan", resultado.get().getNombre());
+        assertEquals(puesto, resultado.get().getPuesto());
         verify(empleadoRepository, times(1)).findById(1L);
     }
 
     @Test
     void guardarEmpleado_DeberiaRetornarEmpleadoGuardado() {
         // Arrange
-        Empleado empleado = new Empleado("Ana", "García", "ana.garcia@example.com", "0987654321", "Analista", 60000.0);
+        Puesto puesto = new Puesto();
+        puesto.setId(1L);
+        puesto.setNombre("Analista");
+
+        Empleado empleado = new Empleado("Ana", "García", "ana.garcia@example.com", "0987654321", puesto, 60000.0);
         when(empleadoRepository.save(empleado)).thenReturn(empleado);
 
         // Act
@@ -69,8 +88,10 @@ public class EmpleadoServiceTest {
 
         // Assert
         assertEquals("Ana", resultado.getNombre());
+        assertEquals(puesto, resultado.getPuesto());
         verify(empleadoRepository, times(1)).save(empleado);
-    }*/
+    }
+
 
     @Test
     void eliminarEmpleado_DeberiaLlamarDeleteById() {

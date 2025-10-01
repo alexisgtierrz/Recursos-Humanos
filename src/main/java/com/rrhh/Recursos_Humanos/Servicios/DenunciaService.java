@@ -14,10 +14,10 @@ import java.util.Optional;
 public class DenunciaService {
 
     @Autowired
-    private DenunciaRepository denunciaRepository;
+    public DenunciaRepository denunciaRepository;
 
     @Autowired
-    private EmpleadoRepository empleadoRepositorio;
+    public EmpleadoRepository empleadoRepositorio;
 
     // Crear y asignar denuncia a un empleado
     public Denuncia crearDenuncia(Long empleadoId, Denuncia denuncia) {
