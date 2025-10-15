@@ -10,27 +10,34 @@
 <header>
     <p>SISTEMA DE RRHH</p>
     <nav>
-        <a href="empleados.html">Lista de Empleados</a>
+        <a href="empleados.html">Gestión de Empleados</a>
         <a href="denuncias.html">Denuncias</a>
+        
+        <div class="logout">
+        <button class="btn btn-red">Cerrar Sesión</button>
+        </div>
     </nav>
+    
+    
 </header>
 
 <main>
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Buscar empleado...">
+        <input type="text" id="searchInput" placeholder="Buscar empleado..." class="search-bar">
+        <div class="bottom-right">
+            <a href="agregar_empleado.html" class="btn" id="btnAgregar">Agregar Empleado</a>
+        </div>
     </div>
 
     <!-- Listado de empleados dinámico -->
     <div id="empleados-list"></div>
 
-    <div class="bottom-right">
+   <!-- <div class="bottom-right">
         <a href="agregar_empleado.html" class="btn" id="btnAgregar">Agregar Empleado</a>
-    </div>
+    </div> -->
 </main>
 
-<div class="logout">
-    <button class="btn btn-red">Cerrar Sesión</button>
-</div>
+
 
 <footer>
     <p>Todos los Derechos Reservados 2025 &copy;</p>

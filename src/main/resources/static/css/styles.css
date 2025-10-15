@@ -7,19 +7,22 @@ body {
 }
 
 header {
-    background: #004080;
+   background: #004080;
     color: white;
     padding: 15px;
     text-align: center;
     font-size: 1.5rem;
+    position: relative;
 }
 
 header nav {
-    margin-top: 10px;
+     margin-top: 10px;
+    display: inline-flex;
+    gap: 15px;
 }
 
 header nav a {
-    margin: 0 10px;
+    margin-right: 100px;
     color: white;
     text-decoration: none;
     font-weight: bold;
@@ -27,6 +30,12 @@ header nav a {
 
 header nav a:hover {
     text-decoration: underline;
+}
+
+header nav .btn-red {
+     position: absolute;
+    right: 20px;
+    bottom: 15px; 
 }
 
 main {
@@ -149,16 +158,12 @@ input, select, textarea {
 
 /* ======== BOTONES FIJOS ======== */
 .bottom-right {
-    position: fixed;
-    bottom: 130px;   /* 👈 sube el botón por encima del footer */
-    right: 20px;
+    position: static; /* elimina el fijo */
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0px; /* separa del contenido */
 }
 
-.logout {
-    position: fixed;
-    bottom: 80px;  /* 👈 sube el botón aún más arriba */
-    right: 20px;
-}
 
 /* ======== FOOTER ======== */
 footer {
@@ -173,3 +178,19 @@ footer {
 }
 
 
+/*==============BOTON LADO BARRA====================*/
+
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* distribuye: izquierda / derecha */
+}
+
+.search-bar {
+  flex: 1; /* ocupa todo el espacio disponible */
+  max-width: 1400px; /* o el ancho que quieras */
+}
+
+.bottom-right {
+  margin-left: 10px;
+}
