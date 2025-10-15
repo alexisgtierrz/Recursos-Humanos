@@ -12,8 +12,8 @@
     <nav>
         <a href="empleados.html">Gestión de Empleados</a>
         <a href="denuncias.html">Denuncias</a>
-         <div class="logout">
-        <button class="btn btn-red">Cerrar Sesión</button>
+        <div class="logout">
+            <button class="btn btn-red">Cerrar Sesión</button>
         </div>
     </nav>
 </header>
@@ -22,12 +22,11 @@
     <div class="search-box">
         <h2 class=""search-bar"> Listado de Denuncias </h2>
         <div class="bottom-right">
-            <a href="agregar_denuncias.html" class="btn" id="btnAgregar">Agregar Denuncias</a>
+            <a href="agregar_denuncia.html" class="btn" id="btnAgregar">Agregar Denuncias</a>
         </div>
     </div>
-    
 
-    <!-- Contenedor dinámico para denuncias -->
+
     <div id="denuncias-list"></div>
 </main>
 
@@ -78,6 +77,10 @@
 
     // Renderizar denuncias
     function renderDenuncias(denuncias) {
+        // --- LÍNEA AGREGADA PARA ORDENAR ---
+        // Ordenar denuncias: de la más nueva a la más antigua
+        denuncias.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
         denunciasList.innerHTML = "";
 
         if (!denuncias.length) {
