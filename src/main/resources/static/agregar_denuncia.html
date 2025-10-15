@@ -19,17 +19,23 @@
     <div class="form-container">
         <h2>Agregar Denuncia</h2>
         <form id="denunciaForm">
-            <!-- Puestos -->
+            <!-- Puesto (opcional, para referencia) -->
             <label for="puestos">Puesto</label>
             <select id="puestos" required>
                 <option value="" disabled selected>--Seleccione--</option>
             </select>
 
-            <!-- Empleados filtrados por puesto -->
-            <label for="empleados">Empleados</label>
-            <select id="empleados" required>
-                <option value="" disabled selected>--Seleccione--</option>
-            </select>
+            <!-- ID del Empleado -->
+            <label for="empleadoId">ID del Empleado</label>
+            <input type="number" id="empleadoId" required placeholder="Ingresa el ID">
+
+            <!-- Campos autocompletados -->
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" readonly>
+            <label for="apellido">Apellido</label>
+            <input type="text" id="apellido" readonly>
+            <label for="email">Email</label>
+            <input type="email" id="email" readonly>
 
             <!-- Motivo -->
             <div class="form-group">
@@ -52,7 +58,11 @@
 
 <script>
     const puestosSelect = document.getElementById("puestos");
-    const empleadosSelect = document.getElementById("empleados");
+    const empleadoIdInput = document.getElementById("empleadoId");
+    const nombreInput = document.getElementById("nombre");
+    const apellidoInput = document.getElementById("apellido");
+    const emailInput = document.getElementById("email");
+    const motivoInput = document.getElementById("motivo");
     const form = document.getElementById("denunciaForm");
 
     // Traer puestos desde el backend
@@ -71,34 +81,47 @@
         }
     }
 
-    // Traer empleados filtrados por puesto
-    async function fetchEmpleados(puestoId) {
+    // Traer datos del empleado por ID
+    async function fetchEmpleadoPorId(id) {
         try {
-            empleadosSelect.innerHTML = '<option value="" disabled selected>--Seleccione--</option>';
-            const res = await fetch(`http://localhost:8080/api/empleados/puesto/${puestoId}`);
-            const empleados = await res.json();
-            empleados.forEach(e => {
-                const option = document.createElement("option");
-                option.value = e.id;
-                option.textContent = `${e.nombre} ${e.apellido}`;
-                empleadosSelect.appendChild(option);
-            });
+            const res = await fetch(`http://localhost:8080/api/empleados/${id}`);
+            if (!res.ok) throw new Error("Empleado no encontrado");
+            const empleado = await res.json();
+            nombreInput.value = empleado.nombre || '';
+            apellidoInput.value = empleado.apellido || '';
+            emailInput.value = empleado.email || '';
         } catch (error) {
-            console.error("Error cargando empleados:", error);
+            console.error("Error al obtener empleado:", error);
+            limpiarCampos();
+            empleadoIdInput.classList.add('is-invalid'); // Asume CSS para validación
         }
     }
 
-    // Evento cambio de puesto
-    puestosSelect.addEventListener("change", (e) => {
-        const puestoId = e.target.value;
-        if (puestoId) fetchEmpleados(puestoId);
+    // Evento cambio de ID
+    empleadoIdInput.addEventListener("input", (e) => {
+        const id = e.target.value.trim();
+        if (id === '') {
+            limpiarCampos();
+            return;
+        }
+        if (!isNaN(id)) {
+            fetchEmpleadoPorId(id);
+        } else {
+            limpiarCampos();
+            empleadoIdInput.classList.add('is-invalid');
+        }
     });
 
     // Enviar formulario
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const empleadoId = empleadosSelect.value;
-        const descripcion = document.getElementById("motivo").value;
+        const empleadoId = empleadoIdInput.value;
+        const descripcion = motivoInput.value;
+
+        if (!nombreInput.value || !apellidoInput.value) {
+            alert("Por favor, ingresa un ID válido de empleado.");
+            return;
+        }
 
         try {
             const res = await fetch(`http://localhost:8080/api/denuncias/empleado/${empleadoId}`, {
@@ -106,7 +129,7 @@
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ descripcion})
+                body: JSON.stringify({ descripcion })
             });
             if (res.ok) {
                 alert("Denuncia agregada correctamente");
@@ -121,6 +144,13 @@
 
     // Inicialización
     fetchPuestos();
+
+    function limpiarCampos() {
+        nombreInput.value = '';
+        apellidoInput.value = '';
+        emailInput.value = '';
+        empleadoIdInput.classList.remove('is-invalid');
+    }
 </script>
 </body>
 </html>
