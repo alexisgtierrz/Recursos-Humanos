@@ -158,10 +158,10 @@ input, select, textarea {
 
 /* ======== BOTONES FIJOS ======== */
 .bottom-right {
-      position: static; /* elimina el fijo */
+    position: static; /* elimina el fijo */
     display: flex;
     justify-content: flex-end;
-    margin-top: 30px; /* separa del contenido */
+    margin-top: 0px; /* separa del contenido */
 }
 
 
@@ -178,3 +178,19 @@ footer {
 }
 
 
+/*==============BOTON LADO BARRA====================*/
+
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* distribuye: izquierda / derecha */
+}
+
+.search-bar {
+  flex: 1; /* ocupa todo el espacio disponible */
+  max-width: 1400px; /* o el ancho que quieras */
+}
+
+.bottom-right {
+  margin-left: 10px;
+}
