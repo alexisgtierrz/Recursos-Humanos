@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA DE RRHH</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <p>SISTEMA DE RRHH</p>
+    <nav>
+        <a href="empleados.html">Gestión de Empleados</a>
+        <a href="denuncias.html">Denuncias</a>
+        <div class="logout">
+            <button class="btn btn-red">Cerrar Sesión</button>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="search-box">
+        <h2 class=""search-bar"> Listado de Denuncias </h2>
+        <div class="bottom-right">
+            <a href="agregar_denuncia.html" class="btn" id="btnAgregar">Agregar Denuncias</a>
+        </div>
+    </div>
+
+
+    <div id="denuncias-list"></div>
+</main>
+
+<footer>
+    <p>Todos los Derechos Reservados 2025 &copy;</p>
+</footer>
+
+<script>
+    const denunciasList = document.getElementById("denuncias-list");
+
+    // Traer denuncias desde el backend
+    async function fetchDenuncias() {
+        try {
+            const response = await fetch("http://localhost:8080/api/denuncias", {
+                headers: {
+                    "Authorization": "Basic " + btoa("admin:Password123")
+                }
+            });
+            const denuncias = await response.json();
+            renderDenuncias(Array.isArray(denuncias) ? denuncias : []);
+        } catch (error) {
+            console.error("Error cargando denuncias:", error);
+            denunciasList.innerHTML = "<p>No se pudieron cargar las denuncias.</p>";
+        }
+    }
+
+    // Función para eliminar denuncia
+    async function eliminarDenuncia(id) {
+        if (!confirm("¿Seguro que quieres eliminar esta denuncia?")) return;
+
+        try {
+            const res = await fetch(`http://localhost:8080/api/denuncias/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Basic " + btoa("admin:Password123")
+                }
+            });
+            if (res.ok) {
+                alert("Denuncia eliminada correctamente ✅");
+                fetchDenuncias();
+            } else {
+                alert("Error al eliminar denuncia");
+            }
+        } catch (error) {
+            console.error("Error al eliminar denuncia:", error);
+        }
+    }
+
+    // Renderizar denuncias
+    function renderDenuncias(denuncias) {
+        // --- LÍNEA AGREGADA PARA ORDENAR ---
+        // Ordenar denuncias: de la más nueva a la más antigua
+        denuncias.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        denunciasList.innerHTML = "";
+
+        if (!denuncias.length) {
+            denunciasList.innerHTML = "<p>No hay denuncias registradas.</p>";
+            return;
+        }
+
+        denuncias.forEach(d => {
+            const empleadoNombre = d.empleado ? `${d.empleado.nombre} ${d.empleado.apellido}` : "Empleado desconocido";
+            const fecha = d.fecha ? new Date(d.fecha).toLocaleDateString() : "Fecha no disponible";
+
+            const card = document.createElement("div");
+            card.classList.add("card");
+
+            card.innerHTML = `
+            <div>
+                <strong>${empleadoNombre}</strong><br>
+                Motivo: ${d.descripcion} <br>
+                Fecha: ${fecha}
+            </div>
+            <div class="actions">
+                <button class="eliminar" data-id="${d.id}">🗑️</button>
+            </div>
+        `;
+
+            denunciasList.appendChild(card);
+        });
+
+        // Asignar evento eliminar
+        document.querySelectorAll(".eliminar").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const id = this.getAttribute("data-id");
+                eliminarDenuncia(id);
+            });
+        });
+    }
+
+    // Inicializar
+    fetchDenuncias();
+
+    // Cerrar sesión
+    document.querySelector(".logout .btn-red").addEventListener("click", function() {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    });
+</script>
+
+</body>
+</html>

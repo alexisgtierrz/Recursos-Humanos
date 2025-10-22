@@ -1,0 +1,196 @@
+/* ======== ESTILOS GENERALES ======== */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+header {
+   background: #004080;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 1.5rem;
+    position: relative;
+}
+
+header nav {
+     margin-top: 10px;
+    display: inline-flex;
+    gap: 15px;
+}
+
+header nav a {
+    margin-right: 100px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+header nav a:hover {
+    text-decoration: underline;
+}
+
+header nav .btn-red {
+     position: absolute;
+    right: 20px;
+    bottom: 15px; 
+}
+
+main {
+    padding: 20px;
+    padding-bottom: 60px;/* 👈 espacio para botones fijos */
+}
+
+
+h2 {
+    color: #004080;
+}
+
+/* ======== BOTONES ======== */
+.btn {
+    background: #004080;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn:hover {
+    background: #0066cc;
+}
+
+.btn-red {
+    background: #cc0000;
+}
+
+.btn-red:hover {
+    background: #ff3333;
+}
+
+/* ======== LOGIN ======== */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+}
+
+.login-box {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    width: 300px;
+}
+
+.login-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.show-password {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* ======== CARDS Y LISTAS ======== */
+.card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0px 0px 5px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card .edit {
+    cursor: pointer;
+    color: #004080;
+    font-weight: bold;
+}
+
+/* ======== FORMULARIOS ======== */
+.form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* ======== BUSCADOR ======== */
+.search-box {
+    margin-bottom: 15px;
+}
+
+/* ======== BOTONES FIJOS ======== */
+.bottom-right {
+    position: static; /* elimina el fijo */
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0px; /* separa del contenido */
+}
+
+
+/* ======== FOOTER ======== */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #004080;
+    color: white;
+    text-align: center;
+    padding: 10px;
+}
+
+
+/*==============BOTON LADO BARRA====================*/
+
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* distribuye: izquierda / derecha */
+}
+
+.search-bar {
+  flex: 1; /* ocupa todo el espacio disponible */
+  max-width: 1400px; /* o el ancho que quieras */
+}
+
+.bottom-right {
+  margin-left: 10px;
+}

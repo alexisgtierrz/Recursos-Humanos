@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Denuncia - RRHH</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <p>SISTEMA DE RRHH</p>
+    <nav>
+        <a href="empleados.html">Gestión Empleados</a>
+        <a href="denuncias.html">Denuncias</a>
+        <div class="logout">
+        <button class="btn btn-red">Cerrar Sesión</button>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="form-container">
+        <h2>Agregar Denuncia</h2>
+        <form id="denunciaForm">
+            <!-- Puesto (opcional, para referencia) -->
+            <label for="puestos">Puesto</label>
+            <select id="puestos" required>
+                <option value="" disabled selected>--Seleccione--</option>
+            </select>
+
+            <!-- ID del Empleado -->
+            <label for="empleadoId">ID del Empleado</label>
+            <input type="number" id="empleadoId" required placeholder="Ingresa el ID">
+
+            <!-- Campos autocompletados -->
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" readonly>
+            <label for="apellido">Apellido</label>
+            <input type="text" id="apellido" readonly>
+            <label for="email">Email</label>
+            <input type="email" id="email" readonly>
+
+            <!-- Motivo -->
+            <div class="form-group">
+                <label for="motivo">Motivo:</label>
+                <textarea id="motivo" required></textarea>
+            </div>
+
+            <!-- Botones -->
+            <div class="form-actions">
+                <button type="submit" class="btn">Guardar</button>
+                <a href="denuncias.html" class="btn btn-red">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer>
+    <p>Todos los Derechos Reservados 2025 &copy;</p>
+</footer>
+
+<script>
+    const puestosSelect = document.getElementById("puestos");
+    const empleadoIdInput = document.getElementById("empleadoId");
+    const nombreInput = document.getElementById("nombre");
+    const apellidoInput = document.getElementById("apellido");
+    const emailInput = document.getElementById("email");
+    const motivoInput = document.getElementById("motivo");
+    const form = document.getElementById("denunciaForm");
+
+    // Traer puestos desde el backend
+    async function fetchPuestos() {
+        try {
+            const res = await fetch("http://localhost:8080/api/puestos");
+            const puestos = await res.json();
+            puestos.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p.id;
+                option.textContent = p.nombre;
+                puestosSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error cargando puestos:", error);
+        }
+    }
+
+    // Traer datos del empleado por ID
+    async function fetchEmpleadoPorId(id) {
+        try {
+            const res = await fetch(`http://localhost:8080/api/empleados/${id}`);
+            if (!res.ok) throw new Error("Empleado no encontrado");
+            const empleado = await res.json();
+            nombreInput.value = empleado.nombre || '';
+            apellidoInput.value = empleado.apellido || '';
+            emailInput.value = empleado.email || '';
+        } catch (error) {
+            console.error("Error al obtener empleado:", error);
+            limpiarCampos();
+            empleadoIdInput.classList.add('is-invalid'); // Asume CSS para validación
+        }
+    }
+
+    // Evento cambio de ID
+    empleadoIdInput.addEventListener("input", (e) => {
+        const id = e.target.value.trim();
+        if (id === '') {
+            limpiarCampos();
+            return;
+        }
+        if (!isNaN(id)) {
+            fetchEmpleadoPorId(id);
+        } else {
+            limpiarCampos();
+            empleadoIdInput.classList.add('is-invalid');
+        }
+    });
+
+    // Enviar formulario
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const empleadoId = empleadoIdInput.value;
+        const descripcion = motivoInput.value;
+
+        if (!nombreInput.value || !apellidoInput.value) {
+            alert("Por favor, ingresa un ID válido de empleado.");
+            return;
+        }
+
+        try {
+            const res = await fetch(`http://localhost:8080/api/denuncias/empleado/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ descripcion })
+            });
+            if (res.ok) {
+                alert("Denuncia agregada correctamente");
+                window.location.href = "denuncias.html";
+            } else {
+                alert("Error al agregar denuncia");
+            }
+        } catch (error) {
+            console.error("Error al guardar denuncia:", error);
+        }
+    });
+
+    // Inicialización
+    fetchPuestos();
+
+    function limpiarCampos() {
+        nombreInput.value = '';
+        apellidoInput.value = '';
+        emailInput.value = '';
+        empleadoIdInput.classList.remove('is-invalid');
+    }
+</script>
+</body>
+</html>
