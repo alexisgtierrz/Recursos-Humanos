@@ -190,7 +190,7 @@ class EmpleadoIntegrationTest {
         Empleado empleadoActualizado = new Empleado();
         empleadoActualizado.setNombre("MariaActualizada");
         empleadoActualizado.setApellido("Gomez"); // Mantenemos apellido
-        empleadoActualizado.setDni("12345676"); // Mantenemos DNI
+        empleadoActualizado.setDni("12345678"); // Mantenemos DNI
         empleadoActualizado.setFechaNacimiento("04/04/1994");
         empleadoActualizado.setEmail("maria.actualizada@example.com"); // Email actualizado
         empleadoActualizado.setTelefono("3534123456");
