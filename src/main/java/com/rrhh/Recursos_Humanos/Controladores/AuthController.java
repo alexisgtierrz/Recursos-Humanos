@@ -40,10 +40,26 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o contraseña incorrectos");
         }
     }
-
-    @Data // de Lombok, o manualmente los getters/setters
     public static class LoginRequest {
         private String usuario;
         private String password;
+
+        // --- AÑADE ESTOS MÉTODOS MANUALMENTE ---
+        public String getUsuario() {
+            return usuario;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        // (Opcional: añade setters si también los necesitas)
+        public void setUsuario(String usuario) {
+            this.usuario = usuario;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
     }
 }
