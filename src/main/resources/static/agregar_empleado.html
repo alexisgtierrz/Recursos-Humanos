@@ -19,7 +19,7 @@
 </header>
 
 <main>
-    <div class="form-container">
+    <div class="form-container"> <div class="container"> <div id="mensaje-feedback" style="display: none;"></div>
         <h2 id="tituloForm">Agregar Personal</h2>
         <form id="empleadoForm">
             <input type="hidden" id="empleadoId"> <!-- para edición -->
@@ -119,7 +119,16 @@
             document.getElementById("salario").value = empleado.salario;
         } catch (error) {
             console.error("Error al cargar empleado:", error);
-            alert("No se pudo cargar el empleado.");
+
+            // --- CAMBIO AQUÍ ---
+            // alert("No se pudo cargar el empleado."); // Reemplazado
+            const mensajeDiv = document.getElementById("mensaje-feedback");
+            mensajeDiv.textContent = "No se pudo cargar el empleado. Error: " + error.message;
+            mensajeDiv.style.display = "block";
+            mensajeDiv.style.color = "red";
+            mensajeDiv.style.border = "1px solid red";
+            mensajeDiv.style.padding = "10px";
+            mensajeDiv.style.marginBottom = "10px";
         }
     }
 
@@ -134,6 +143,11 @@
     // Enviar formulario (POST o PUT)
     document.getElementById("empleadoForm").addEventListener("submit", async function(event) {
         event.preventDefault();
+
+        // Obtenemos el div de mensajes una sola vez
+        const mensajeDiv = document.getElementById("mensaje-feedback");
+        // Ocultamos el mensaje anterior antes de enviar
+        mensajeDiv.style.display = "none";
 
         const empleado = {
             nombre: document.getElementById("nombre").value,
@@ -159,16 +173,42 @@
             });
 
             if (response.ok) {
-                alert("Empleado guardado correctamente ✅");
-                sessionStorage.removeItem("editarEmpleadoId"); // limpiar edición
-                window.location.href = "empleados.html";
+                // --- CAMBIO AQUÍ (ÉXITO) ---
+                // alert("Empleado guardado correctamente"); // Reemplazado
+                mensajeDiv.textContent = "Empleado guardado correctamente";
+                mensajeDiv.style.color = "green";
+                mensajeDiv.style.border = "1px solid green";
+                mensajeDiv.style.padding = "10px";
+                mensajeDiv.style.marginBottom = "10px";
+                mensajeDiv.style.display = "block";
+
+                // Esperamos 2 segundos antes de redirigir para que se vea el mensaje
+                setTimeout(() => {
+                    sessionStorage.removeItem("editarEmpleadoId"); // limpiar edición
+                    window.location.href = "empleados.html";
+                }, 2000); // 2 segundos
+
             } else {
                 const error = await response.json();
-                alert("Error al guardar: " + (error.message || "Verifique los datos"));
+                // --- CAMBIO AQUÍ (ERROR DE GUARDADO) ---
+                // alert("Error al guardar: " + (error.message || "Verifique los datos")); // Reemplazado
+                mensajeDiv.textContent = "Error al guardar: " + (error.message || "Verifique los datos");
+                mensajeDiv.style.color = "red";
+                mensajeDiv.style.border = "1px solid red";
+                mensajeDiv.style.padding = "10px";
+                mensajeDiv.style.marginBottom = "10px";
+                mensajeDiv.style.display = "block";
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("No se pudo conectar con el servidor.");
+            // --- CAMBIO AQUÍ (ERROR DE CONEXIÓN) ---
+            // alert("No se pudo conectar con el servidor."); // Reemplazado
+            mensajeDiv.textContent = "No se pudo conectar con el servidor. " + error.message;
+            mensajeDiv.style.color = "red";
+            mensajeDiv.style.border = "1px solid red";
+            mensajeDiv.style.padding = "10px";
+            mensajeDiv.style.marginBottom = "10px";
+            mensajeDiv.style.display = "block";
         }
     });
 

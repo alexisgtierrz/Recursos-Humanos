@@ -26,6 +26,18 @@
         </div>
     </div>
 
+    <div id="mensaje-feedback" style="display: none;"></div>
+
+    <div id="confirmarModal" class="modal" style="display: none;">
+        <div class="modal-contenido">
+            <h4>Confirmar Eliminación</h4>
+            <p>¿Seguro que quieres eliminar esta denuncia?</p>
+            <div class="modal-acciones">
+                <button id="btnConfirmarEliminar" class="btn btn-red">Eliminar</button>
+                <button id="btnCancelarEliminar" class="btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <div id="denuncias-list"></div>
 </main>
@@ -36,6 +48,27 @@
 
 <script>
     const denunciasList = document.getElementById("denuncias-list");
+
+    // --- NUEVO: Referencias a los nuevos elementos ---
+    const mensajeDiv = document.getElementById("mensaje-feedback");
+    const modal = document.getElementById("confirmarModal");
+    const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
+    const btnCancelarEliminar = document.getElementById("btnCancelarEliminar");
+
+    // --- NUEVO: Función para mostrar mensajes ---
+    function mostrarMensaje(texto, tipo = "exito") {
+        mensajeDiv.textContent = texto;
+        mensajeDiv.className = tipo === "exito" ? "mensaje-exito" : "mensaje-error";
+        mensajeDiv.style.display = "block";
+
+        // Ocultar solo mensajes de éxito después de 3 seg
+        if (tipo === "exito") {
+            setTimeout(() => {
+                mensajeDiv.style.display = "none";
+            }, 3000);
+        }
+    }
+
 
     // Traer denuncias desde el backend
     async function fetchDenuncias() {
@@ -49,13 +82,17 @@
             renderDenuncias(Array.isArray(denuncias) ? denuncias : []);
         } catch (error) {
             console.error("Error cargando denuncias:", error);
-            denunciasList.innerHTML = "<p>No se pudieron cargar las denuncias.</p>";
+            // --- CAMBIO: Reemplazo de .innerHTML por mensaje ---
+            mostrarMensaje("No se pudieron cargar las denuncias.", "error");
         }
     }
 
-    // Función para eliminar denuncia
+    // --- CAMBIO: Función para eliminar (SIN confirm) ---
     async function eliminarDenuncia(id) {
-        if (!confirm("¿Seguro que quieres eliminar esta denuncia?")) return;
+        // if (!confirm(...)) return; // Se quitó la confirmación
+
+        // Ocultar mensaje anterior
+        mensajeDiv.style.display = "none";
 
         try {
             const res = await fetch(`http://localhost:8080/api/denuncias/${id}`, {
@@ -65,13 +102,17 @@
                 }
             });
             if (res.ok) {
-                alert("Denuncia eliminada correctamente ✅");
-                fetchDenuncias();
+                // --- CAMBIO: Reemplazo de alert por mensaje ---
+                mostrarMensaje("Denuncia eliminada correctamente ✅");
+                fetchDenuncias(); // Recargar lista
             } else {
-                alert("Error al eliminar denuncia");
+                // --- CAMBIO: Reemplazo de alert por mensaje ---
+                mostrarMensaje("Error al eliminar denuncia", "error");
             }
         } catch (error) {
             console.error("Error al eliminar denuncia:", error);
+            // --- CAMBIO: Mensaje de error de conexión ---
+            mostrarMensaje("No se pudo conectar con el servidor.", "error");
         }
     }
 
@@ -109,14 +150,28 @@
             denunciasList.appendChild(card);
         });
 
-        // Asignar evento eliminar
+        // --- CAMBIO: Asignar evento eliminar (ahora abre el modal) ---
         document.querySelectorAll(".eliminar").forEach(btn => {
             btn.addEventListener("click", function() {
                 const id = this.getAttribute("data-id");
-                eliminarDenuncia(id);
+                // Guardar ID en el botón del modal y mostrarlo
+                btnConfirmarEliminar.dataset.idParaEliminar = id;
+                modal.style.display = "flex";
             });
         });
     }
+
+    // --- NUEVO: Listeners para el Modal ---
+    btnCancelarEliminar.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    btnConfirmarEliminar.addEventListener("click", function() {
+        const id = this.dataset.idParaEliminar; // Recuperar el ID
+        modal.style.display = "none"; // Ocultar modal
+        eliminarDenuncia(id); // Llamar a la función de eliminar
+    });
+
 
     // Inicializar
     fetchDenuncias();

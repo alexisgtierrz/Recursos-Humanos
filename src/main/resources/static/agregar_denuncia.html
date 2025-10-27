@@ -13,26 +13,26 @@
         <a href="empleados.html">Gestión Empleados</a>
         <a href="denuncias.html">Denuncias</a>
         <div class="logout">
-        <button class="btn btn-red">Cerrar Sesión</button>
+            <button class="btn btn-red">Cerrar Sesión</button>
         </div>
     </nav>
 </header>
 
 <main>
     <div class="form-container">
+
+        <div id="mensaje-feedback" style="display: none;"></div>
+
         <h2>Agregar Denuncia</h2>
         <form id="denunciaForm">
-            <!-- Puesto (opcional, para referencia) -->
             <label for="puestos">Puesto</label>
             <select id="puestos" required>
                 <option value="" disabled selected>--Seleccione--</option>
             </select>
 
-            <!-- ID del Empleado -->
             <label for="empleadoId">ID del Empleado</label>
             <input type="number" id="empleadoId" required placeholder="Ingresa el ID">
 
-            <!-- Campos autocompletados -->
             <label for="nombre">Nombre</label>
             <input type="text" id="nombre" readonly>
             <label for="apellido">Apellido</label>
@@ -40,13 +40,11 @@
             <label for="email">Email</label>
             <input type="email" id="email" readonly>
 
-            <!-- Motivo -->
             <div class="form-group">
                 <label for="motivo">Motivo:</label>
                 <textarea id="motivo" required></textarea>
             </div>
 
-            <!-- Botones -->
             <div class="form-actions">
                 <button type="submit" class="btn">Guardar</button>
                 <a href="denuncias.html" class="btn btn-red">Cancelar</a>
@@ -68,6 +66,21 @@
     const motivoInput = document.getElementById("motivo");
     const form = document.getElementById("denunciaForm");
 
+    // --- NUEVO: Referencia al div de mensajes ---
+    const mensajeDiv = document.getElementById("mensaje-feedback");
+
+    // --- NUEVO: Función para mostrar mensajes ---
+    // (Usando estilos en línea para no depender de CSS)
+    function mostrarMensaje(texto, tipo = "error") {
+        mensajeDiv.textContent = texto;
+        mensajeDiv.style.color = (tipo === "exito") ? "green" : "red";
+        mensajeDiv.style.border = (tipo === "exito") ? "1px solid green" : "1px solid red";
+        mensajeDiv.style.padding = "10px";
+        mensajeDiv.style.marginBottom = "15px";
+        mensajeDiv.style.borderRadius = "5px";
+        mensajeDiv.style.display = "block";
+    }
+
     // Traer puestos desde el backend
     async function fetchPuestos() {
         try {
@@ -81,6 +94,8 @@
             });
         } catch (error) {
             console.error("Error cargando puestos:", error);
+            // --- CAMBIO: Mostrar error ---
+            mostrarMensaje("Error al cargar la lista de puestos.", "error");
         }
     }
 
@@ -93,10 +108,17 @@
             nombreInput.value = empleado.nombre || '';
             apellidoInput.value = empleado.apellido || '';
             emailInput.value = empleado.email || '';
+
+            // --- CAMBIO: Ocultar mensaje si todo OK ---
+            mensajeDiv.style.display = "none";
+            empleadoIdInput.classList.remove('is-invalid');
+
         } catch (error) {
             console.error("Error al obtener empleado:", error);
             limpiarCampos();
-            empleadoIdInput.classList.add('is-invalid'); // Asume CSS para validación
+            empleadoIdInput.classList.add('is-invalid');
+            // --- CAMBIO: Mostrar error ---
+            mostrarMensaje("Empleado no encontrado o ID inválido.", "error");
         }
     }
 
@@ -118,11 +140,16 @@
     // Enviar formulario
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
+
+        // --- CAMBIO: Ocultar mensaje anterior ---
+        mensajeDiv.style.display = "none";
+
         const empleadoId = empleadoIdInput.value;
         const descripcion = motivoInput.value;
 
         if (!nombreInput.value || !apellidoInput.value) {
-            alert("Por favor, ingresa un ID válido de empleado.");
+            // --- CAMBIO: Reemplazo de alert ---
+            mostrarMensaje("Por favor, ingresa un ID válido de empleado.", "error");
             return;
         }
 
@@ -135,13 +162,19 @@
                 body: JSON.stringify({ descripcion })
             });
             if (res.ok) {
-                alert("Denuncia agregada correctamente");
-                window.location.href = "denuncias.html";
+                // --- CAMBIO: Reemplazo de alert + setTimeout ---
+                mostrarMensaje("Denuncia agregada correctamente", "exito");
+                setTimeout(() => {
+                    window.location.href = "denuncias.html";
+                }, 2000); // 2 segundos de espera
             } else {
-                alert("Error al agregar denuncia");
+                // --- CAMBIO: Reemplazo de alert ---
+                mostrarMensaje("Error al agregar denuncia", "error");
             }
         } catch (error) {
             console.error("Error al guardar denuncia:", error);
+            // --- CAMBIO: Mensaje de error de conexión ---
+            mostrarMensaje("No se pudo conectar con el servidor.", "error");
         }
     });
 

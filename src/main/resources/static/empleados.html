@@ -12,13 +12,13 @@
     <nav>
         <a href="empleados.html">Gestión de Empleados</a>
         <a href="denuncias.html">Denuncias</a>
-        
+
         <div class="logout">
-        <button class="btn btn-red">Cerrar Sesión</button>
+            <button class="btn btn-red">Cerrar Sesión</button>
         </div>
     </nav>
-    
-    
+
+
 </header>
 
 <main>
@@ -29,12 +29,19 @@
         </div>
     </div>
 
-    <!-- Listado de empleados dinámico -->
-    <div id="empleados-list"></div>
+    <div id="mensaje-feedback" style="display: none;"></div>
 
-   <!-- <div class="bottom-right">
-        <a href="agregar_empleado.html" class="btn" id="btnAgregar">Agregar Empleado</a>
-    </div> -->
+    <div id="confirmarModal" class="modal" style="display: none;">
+        <div class="modal-contenido">
+            <h4>Confirmar Eliminación</h4>
+            <p>¿Seguro que quieres eliminar este empleado?</p>
+            <div class="modal-acciones">
+                <button id="btnConfirmarEliminar" class="btn btn-red">Eliminar</button>
+                <button id="btnCancelarEliminar" class="btn">Cancelar</button>
+            </div>
+        </div>
+    </div> <div id="empleados-list"></div>
+
 </main>
 
 
@@ -45,6 +52,26 @@
 
 <script>
     let empleadosGlobal = []; // 🔹 Guardamos todos los empleados aquí
+
+    // --- NUEVO: Obtenemos referencias a los nuevos elementos ---
+    const mensajeDiv = document.getElementById("mensaje-feedback");
+    const modal = document.getElementById("confirmarModal");
+    const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
+    const btnCancelarEliminar = document.getElementById("btnCancelarEliminar");
+
+    // --- NUEVO: Función para mostrar mensajes ---
+    function mostrarMensaje(texto, tipo = "exito") {
+        mensajeDiv.textContent = texto;
+        mensajeDiv.className = tipo === "exito" ? "mensaje-exito" : "mensaje-error";
+        mensajeDiv.style.display = "block";
+
+        // Ocultar solo mensajes de éxito después de 3 seg
+        if (tipo === "exito") {
+            setTimeout(() => {
+                mensajeDiv.style.display = "none";
+            }, 3000);
+        }
+    }
 
     // Función para traer empleados desde el backend
     function fetchEmpleados() {
@@ -58,7 +85,10 @@
                 empleadosGlobal = data; // guardamos los empleados
                 renderEmpleados(data); // renderizamos
             })
-            .catch(err => console.error("Error cargando empleados:", err));
+            .catch(err => {
+                console.error("Error cargando empleados:", err);
+                mostrarMensaje("Error al cargar la lista de empleados.", "error");
+            });
     }
 
     // Función para renderizar empleados en la página
@@ -94,7 +124,7 @@
             contenedor.appendChild(card);
         });
 
-        // Eventos editar
+        // Eventos editar (sin cambios)
         document.querySelectorAll(".editar").forEach(btn => {
             btn.addEventListener("click", function() {
                 const id = this.getAttribute("data-id");
@@ -103,34 +133,56 @@
             });
         });
 
-        // Eventos eliminar
+        // --- CAMBIO: Eventos eliminar (ahora solo abre el modal) ---
         document.querySelectorAll(".eliminar").forEach(btn => {
-            btn.addEventListener("click", async function() {
+            btn.addEventListener("click", function() {
                 const id = this.getAttribute("data-id");
-                if (confirm("¿Seguro que quieres eliminar este empleado?")) {
-                    try {
-                        const response = await fetch(`http://localhost:8080/api/empleados/${id}`, {
-                            method: "DELETE",
-                            headers: {
-                                "Authorization": "Basic " + btoa("admin:Password123")
-                            }
-                        });
-                        if (response.ok) {
-                            alert("Empleado eliminado correctamente ✅");
-                            fetchEmpleados();
-                        } else {
-                            alert("Error al eliminar el empleado");
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        alert("No se pudo conectar con el servidor.");
-                    }
-                }
+                // Guardamos el ID en el botón de confirmar del modal
+                btnConfirmarEliminar.dataset.idParaEliminar = id;
+                modal.style.display = "flex"; // Muestra el modal
             });
         });
     }
 
-    // 🔹 Búsqueda en vivo (ahora filtra la lista global y re-renderiza)
+    // --- NUEVO: Listeners para el Modal (se añaden una sola vez) ---
+
+    // Al hacer clic en "Cancelar" en el modal
+    btnCancelarEliminar.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // Al hacer clic en "Eliminar" en el modal
+    btnConfirmarEliminar.addEventListener("click", async function() {
+        const id = this.dataset.idParaEliminar; // Obtenemos el ID guardado
+        modal.style.display = "none"; // Ocultamos el modal
+
+        // Ocultamos cualquier mensaje viejo
+        mensajeDiv.style.display = "none";
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/empleados/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Basic " + btoa("admin:Password123")
+                }
+            });
+            if (response.ok) {
+                // --- REEMPLAZO DE ALERT (ÉXITO) ---
+                mostrarMensaje("Empleado eliminado correctamente ✅");
+                fetchEmpleados(); // Recarga la lista
+            } else {
+                // --- REEMPLAZO DE ALERT (ERROR) ---
+                mostrarMensaje("Error al eliminar el empleado", "error");
+            }
+        } catch (error) {
+            console.error(error);
+            // --- REEMPLAZO DE ALERT (CONEXIÓN) ---
+            mostrarMensaje("No se pudo conectar con el servidor.", "error");
+        }
+    });
+
+
+    // 🔹 Búsqueda en vivo (sin cambios)
     document.getElementById("searchInput").addEventListener("input", function() {
         const filtro = this.value.toLowerCase();
         const filtrados = empleadosGlobal.filter(emp =>
@@ -139,14 +191,14 @@
         renderEmpleados(filtrados);
     });
 
-    // Cerrar sesión
+    // Cerrar sesión (sin cambios)
     document.querySelector(".logout .btn-red").addEventListener("click", function() {
         localStorage.clear();
         sessionStorage.clear();
         window.location.href = "index.html";
     });
 
-    // 🔹 Limpiar sessionStorage si presiono "Agregar Empleado"
+    // 🔹 Limpiar sessionStorage si presiono "Agregar Empleado" (sin cambios)
     const btnAgregar = document.getElementById("btnAgregar");
     if (btnAgregar) {
         btnAgregar.addEventListener("click", () => {
