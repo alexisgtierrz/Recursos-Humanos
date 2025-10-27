@@ -3,6 +3,7 @@ package com.rrhh.Recursos_Humanos.Controladores;
 import com.rrhh.Recursos_Humanos.Modelos.Empleado;
 import com.rrhh.Recursos_Humanos.Servicios.EmpleadoService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,20 +41,30 @@ public class EmpleadoController {
 
     // Editar empleado
     @PutMapping("/{id}")
-    public ResponseEntity<Empleado> actualizarEmpleado(@PathVariable Long id, @RequestBody Empleado empleado) {
-        return empleadoService.obtenerEmpleadoPorId(id)
-                .map(e -> {
-                    e.setNombre(empleado.getNombre());
-                    e.setApellido(empleado.getApellido());
-                    e.setDni(empleado.getDni());
-                    e.setFechaNacimiento(empleado.getFechaNacimiento());
-                    e.setEmail(empleado.getEmail());
-                    e.setTelefono(empleado.getTelefono());
-                    e.setPuesto(empleado.getPuesto());
-                    e.setSalario(empleado.getSalario());
-                    return ResponseEntity.ok(empleadoService.guardarEmpleado(e));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> actualizarEmpleado(@PathVariable Long id, @RequestBody Empleado empleado) {
+        try {
+            // 1. Llama al servicio con AMBOS datos: el ID de la URL y el cuerpo del empleado
+            // El servicio se encarga de buscar, validar y guardar.
+            Empleado empleadoActualizado = empleadoService.actualizarEmpleado(id, empleado);
+
+            // 2. Si todo sale bien, devuelve 200 OK con el empleado actualizado
+            return ResponseEntity.ok(empleadoActualizado);
+
+        } catch (RuntimeException e) {
+            // 3. Captura la excepción "no encontrado" que lanza tu servicio
+            if (e.getMessage().contains("Empleado no encontrado")) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // 4. Captura las excepciones de validación (DNI, email, etc. duplicados)
+            if (e instanceof IllegalArgumentException) {
+                // Devuelve 400 Bad Request con el mensaje de error del servicio
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+
+            // 5. Para cualquier otro error inesperado
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno al actualizar el empleado");
+        }
     }
 
     //Editar empleado

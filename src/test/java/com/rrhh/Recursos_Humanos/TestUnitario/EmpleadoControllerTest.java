@@ -79,22 +79,29 @@ public class EmpleadoControllerTest {
         Empleado actualizado = new Empleado();
         actualizado.setNombre("NuevoNombre");
 
-        when(empleadoService.obtenerEmpleadoPorId(1L)).thenReturn(Optional.of(existente));
-        when(empleadoService.guardarEmpleado(existente)).thenReturn(existente);
+        when(empleadoService.actualizarEmpleado(1L, existente))
+                .thenReturn(actualizado);
 
-        ResponseEntity<Empleado> response = empleadoController.actualizarEmpleado(1L, actualizado);
+        ResponseEntity<?> response = empleadoController.actualizarEmpleado(1L, existente);
+        Empleado responseBody = (Empleado) response.getBody();
 
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals("NuevoNombre", response.getBody().getNombre());
+        assertEquals("NuevoNombre", responseBody.getNombre());
     }
 
     @Test
     void actualizarEmpleado_NoExistente_DeberiaRetornar404() {
-        Empleado actualizado = new Empleado();
-        when(empleadoService.obtenerEmpleadoPorId(1L)).thenReturn(Optional.empty());
+        // Datos del empleado que enviaremos en el body
+        Empleado empleadoActualizadoBody = new Empleado();
+        empleadoActualizadoBody.setNombre("NoImporta");
 
-        ResponseEntity<Empleado> response = empleadoController.actualizarEmpleado(1L, actualizado);
+        when(empleadoService.actualizarEmpleado(1L, empleadoActualizadoBody))
+                .thenThrow(new RuntimeException("Empleado no encontrado con id: 1"));
 
+        // Llamar al controlador
+        ResponseEntity<?> response = empleadoController.actualizarEmpleado(1L, empleadoActualizadoBody);
+
+        // Verificar que el controlador manejó la excepción y la convirtió en 404
         assertEquals(404, response.getStatusCodeValue());
     }
 
