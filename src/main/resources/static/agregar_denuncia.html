@@ -30,15 +30,10 @@
                 <option value="" disabled selected>--Seleccione--</option>
             </select>
 
-            <label for="empleadoId">ID del Empleado</label>
-            <input type="number" id="empleadoId" required placeholder="Ingresa el ID">
-
-            <label for="nombre">Nombre</label>
-            <input type="text" id="nombre" readonly>
-            <label for="apellido">Apellido</label>
-            <input type="text" id="apellido" readonly>
-            <label for="email">Email</label>
-            <input type="email" id="email" readonly>
+            <label for="empleados">Empleados</label>
+            <select id="empleados" required>
+                <option value="" disabled selected>--Seleccione--</option>
+            </select>
 
             <div class="form-group">
                 <label for="motivo">Motivo:</label>
@@ -59,18 +54,11 @@
 
 <script>
     const puestosSelect = document.getElementById("puestos");
-    const empleadoIdInput = document.getElementById("empleadoId");
-    const nombreInput = document.getElementById("nombre");
-    const apellidoInput = document.getElementById("apellido");
-    const emailInput = document.getElementById("email");
-    const motivoInput = document.getElementById("motivo");
+    const empleadosSelect = document.getElementById("empleados");
     const form = document.getElementById("denunciaForm");
 
-    // --- NUEVO: Referencia al div de mensajes ---
     const mensajeDiv = document.getElementById("mensaje-feedback");
 
-    // --- NUEVO: Función para mostrar mensajes ---
-    // (Usando estilos en línea para no depender de CSS)
     function mostrarMensaje(texto, tipo = "error") {
         mensajeDiv.textContent = texto;
         mensajeDiv.style.color = (tipo === "exito") ? "green" : "red";
@@ -81,7 +69,6 @@
         mensajeDiv.style.display = "block";
     }
 
-    // Traer puestos desde el backend
     async function fetchPuestos() {
         try {
             const res = await fetch("http://localhost:8080/api/puestos");
@@ -94,64 +81,42 @@
             });
         } catch (error) {
             console.error("Error cargando puestos:", error);
-            // --- CAMBIO: Mostrar error ---
             mostrarMensaje("Error al cargar la lista de puestos.", "error");
         }
     }
 
-    // Traer datos del empleado por ID
-    async function fetchEmpleadoPorId(id) {
+    // Traer empleados filtrados por puesto
+    async function fetchEmpleados(puestoId) {
         try {
-            const res = await fetch(`http://localhost:8080/api/empleados/${id}`);
-            if (!res.ok) throw new Error("Empleado no encontrado");
-            const empleado = await res.json();
-            nombreInput.value = empleado.nombre || '';
-            apellidoInput.value = empleado.apellido || '';
-            emailInput.value = empleado.email || '';
-
-            // --- CAMBIO: Ocultar mensaje si todo OK ---
-            mensajeDiv.style.display = "none";
-            empleadoIdInput.classList.remove('is-invalid');
-
+            empleadosSelect.innerHTML = '<option value="" disabled selected>--Seleccione--</option>';
+            const res = await fetch(`http://localhost:8080/api/empleados/puesto/${puestoId}`);
+            const empleados = await res.json();
+            empleados.forEach(e => {
+                const option = document.createElement("option");
+                option.value = e.id;
+                option.textContent = `${e.nombre} ${e.apellido}`;
+                empleadosSelect.appendChild(option);
+            });
         } catch (error) {
-            console.error("Error al obtener empleado:", error);
-            limpiarCampos();
-            empleadoIdInput.classList.add('is-invalid');
-            // --- CAMBIO: Mostrar error ---
-            mostrarMensaje("Empleado no encontrado o ID inválido.", "error");
+            console.error("Error cargando empleados:", error);
+            mostrarMensaje("Error al cargar los empleados de ese puesto.", "error");
         }
     }
 
-    // Evento cambio de ID
-    empleadoIdInput.addEventListener("input", (e) => {
-        const id = e.target.value.trim();
-        if (id === '') {
-            limpiarCampos();
-            return;
-        }
-        if (!isNaN(id)) {
-            fetchEmpleadoPorId(id);
-        } else {
-            limpiarCampos();
-            empleadoIdInput.classList.add('is-invalid');
-        }
+    puestosSelect.addEventListener("change", (e) => {
+        mensajeDiv.style.display = "none";
+        const puestoId = e.target.value;
+        if (puestoId) fetchEmpleados(puestoId);
     });
 
     // Enviar formulario
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        // --- CAMBIO: Ocultar mensaje anterior ---
         mensajeDiv.style.display = "none";
 
-        const empleadoId = empleadoIdInput.value;
-        const descripcion = motivoInput.value;
-
-        if (!nombreInput.value || !apellidoInput.value) {
-            // --- CAMBIO: Reemplazo de alert ---
-            mostrarMensaje("Por favor, ingresa un ID válido de empleado.", "error");
-            return;
-        }
+        const empleadoId = empleadosSelect.value;
+        const descripcion = document.getElementById("motivo").value;
 
         try {
             const res = await fetch(`http://localhost:8080/api/denuncias/empleado/${empleadoId}`, {
@@ -159,34 +124,23 @@
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ descripcion })
+                body: JSON.stringify({ descripcion})
             });
             if (res.ok) {
-                // --- CAMBIO: Reemplazo de alert + setTimeout ---
                 mostrarMensaje("Denuncia agregada correctamente", "exito");
                 setTimeout(() => {
                     window.location.href = "denuncias.html";
-                }, 2000); // 2 segundos de espera
+                }, 2000);
             } else {
-                // --- CAMBIO: Reemplazo de alert ---
                 mostrarMensaje("Error al agregar denuncia", "error");
             }
         } catch (error) {
             console.error("Error al guardar denuncia:", error);
-            // --- CAMBIO: Mensaje de error de conexión ---
             mostrarMensaje("No se pudo conectar con el servidor.", "error");
         }
     });
 
-    // Inicialización
     fetchPuestos();
-
-    function limpiarCampos() {
-        nombreInput.value = '';
-        apellidoInput.value = '';
-        emailInput.value = '';
-        empleadoIdInput.classList.remove('is-invalid');
-    }
 </script>
 </body>
 </html>

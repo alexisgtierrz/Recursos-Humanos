@@ -25,7 +25,7 @@ class PuestoTest {
     @Test
     void nombreNoPuedeEstarVacio() {
         Puesto puesto = new Puesto();
-        puesto.setNombre(""); // inválido
+        puesto.setNombre("");
         puesto.setDescripcion("Descripción válida");
 
         Set<ConstraintViolation<Puesto>> violaciones = validator.validate(puesto);
@@ -40,7 +40,7 @@ class PuestoTest {
     @Test
     void nombreNoPuedeSerNull() {
         Puesto puesto = new Puesto();
-        puesto.setNombre(null); // inválido
+        puesto.setNombre(null);
         puesto.setDescripcion("Descripción válida");
 
         Set<ConstraintViolation<Puesto>> violaciones = validator.validate(puesto);

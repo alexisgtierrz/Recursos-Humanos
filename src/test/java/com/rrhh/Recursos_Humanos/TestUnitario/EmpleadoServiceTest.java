@@ -29,7 +29,6 @@ public class EmpleadoServiceTest {
 
     @Test
     void listarEmpleados_DeberiaRetornarLista() {
-        // Arrange
         Puesto puesto1 = new Puesto();
         puesto1.setId(1L);
         puesto1.setNombre("Desarrollador Backend");
@@ -43,10 +42,8 @@ public class EmpleadoServiceTest {
 
         when(empleadoRepository.findAll()).thenReturn(List.of(empleado1, empleado2));
 
-        // Act
         List<Empleado> empleados = empleadoService.listarEmpleados();
 
-        // Assert
         assertEquals(2, empleados.size());
         assertEquals("Juan", empleados.get(0).getNombre());
         assertEquals("Ana", empleados.get(1).getNombre());
@@ -55,7 +52,6 @@ public class EmpleadoServiceTest {
 
     @Test
     void obtenerEmpleadoPorId_DeberiaRetornarEmpleado() {
-        // Arrange
         Puesto puesto = new Puesto();
         puesto.setId(1L);
         puesto.setNombre("Desarrollador");
@@ -63,10 +59,8 @@ public class EmpleadoServiceTest {
         Empleado empleado = new Empleado("Juan", "Pérez", "juan.perez@example.com", "1234567890", puesto, 50000.0);
         when(empleadoRepository.findById(1L)).thenReturn(Optional.of(empleado));
 
-        // Act
         Optional<Empleado> resultado = empleadoService.obtenerEmpleadoPorId(1L);
 
-        // Assert
         assertTrue(resultado.isPresent());
         assertEquals("Juan", resultado.get().getNombre());
         assertEquals(puesto, resultado.get().getPuesto());
@@ -75,7 +69,6 @@ public class EmpleadoServiceTest {
 
     @Test
     void guardarEmpleado_DeberiaRetornarEmpleadoGuardado() {
-        // Arrange
         Puesto puesto = new Puesto();
         puesto.setId(1L);
         puesto.setNombre("Analista");
@@ -83,10 +76,8 @@ public class EmpleadoServiceTest {
         Empleado empleado = new Empleado("Ana", "García", "ana.garcia@example.com", "0987654321", puesto, 60000.0);
         when(empleadoRepository.save(empleado)).thenReturn(empleado);
 
-        // Act
         Empleado resultado = empleadoService.guardarEmpleado(empleado);
 
-        // Assert
         assertEquals("Ana", resultado.getNombre());
         assertEquals(puesto, resultado.getPuesto());
         verify(empleadoRepository, times(1)).save(empleado);
@@ -95,10 +86,8 @@ public class EmpleadoServiceTest {
 
     @Test
     void eliminarEmpleado_DeberiaLlamarDeleteById() {
-        // Act
         empleadoService.eliminarEmpleado(1L);
 
-        // Assert
         verify(empleadoRepository, times(1)).deleteById(1L);
     }
 }

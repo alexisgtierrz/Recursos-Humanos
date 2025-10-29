@@ -48,10 +48,8 @@
             });
 
             if (response.ok) {
-                // ✅ Login correcto → redirigir a empleados.html
                 window.location.href = "empleados.html";
             } else {
-                // ❌ Login fallido → mostrar mensaje
                 document.getElementById("error-msg").style.display = "block";
             }
         } catch (error) {

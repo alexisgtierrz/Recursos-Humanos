@@ -22,7 +22,6 @@ public class Usuario {
 
     @NotBlank(message = "La contraseña no puede estar vacía")
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
-// opcional: patrón de complejidad
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
             message = "La contraseña debe contener mayúsculas, minúsculas y números")
     private String password;

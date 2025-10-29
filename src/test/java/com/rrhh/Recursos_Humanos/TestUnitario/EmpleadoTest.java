@@ -31,16 +31,14 @@ class EmpleadoTest {
         empleado.setDni("44077666");
         empleado.setFechaNacimiento("01/01/2001");
         empleado.setEmail("juan.perez@example.com");
-        empleado.setTelefono("1234567890"); // EXACTAMENTE 10 dígitos
+        empleado.setTelefono("1234567890");
         Puesto puesto = new Puesto();
-        puesto.setNombre("Desarrollador"); // No nulo y válido
+        puesto.setNombre("Desarrollador");
         empleado.setPuesto(puesto);
         empleado.setSalario(50000.0);
 
-        // Act
         Set<ConstraintViolation<Empleado>> violaciones = validator.validate(empleado);
 
-        // Assert
         assertTrue(violaciones.isEmpty(), "No debería haber violaciones cuando todos los atributos son válidos");
     }
 

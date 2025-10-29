@@ -27,18 +27,14 @@ public class UsuarioServiceTest {
 
     @Test
     void loadUserByUsername_UsuarioExistente_DeberiaRetornarUserDetails() {
-        // Arrange
         Usuario usuario = new Usuario("usuario123", "pass123", Set.of("ADMIN", "USER"));
         when(usuarioRepository.findByUsername("usuario123")).thenReturn(Optional.of(usuario));
 
-        // Act
         UserDetails userDetails = usuarioService.loadUserByUsername("usuario123");
 
-        // Assert
         assertEquals("usuario123", userDetails.getUsername());
         assertEquals("pass123", userDetails.getPassword());
 
-        // Comprobamos que los roles estén presentes con ROLE_ automáticamente agregado
         assertTrue(userDetails.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
         assertTrue(userDetails.getAuthorities().stream()
@@ -49,10 +45,8 @@ public class UsuarioServiceTest {
 
     @Test
     void loadUserByUsername_UsuarioNoExistente_DeberiaLanzarExcepcion() {
-        // Arrange
         when(usuarioRepository.findByUsername("inexistente")).thenReturn(Optional.empty());
 
-        // Act & Assert
         UsernameNotFoundException exception = assertThrows(UsernameNotFoundException.class,
                 () -> usuarioService.loadUserByUsername("inexistente"));
 
@@ -62,41 +56,32 @@ public class UsuarioServiceTest {
 
     @Test
     void validarCredenciales_Correctas_DeberiaRetornarTrue() {
-        // Arrange
         Usuario usuario = new Usuario("usuario123", "pass123", Set.of("ADMIN"));
         when(usuarioRepository.findByUsername("usuario123")).thenReturn(Optional.of(usuario));
 
-        // Act
         boolean resultado = usuarioService.validarCredenciales("usuario123", "pass123");
 
-        // Assert
         assertTrue(resultado);
         verify(usuarioRepository, times(1)).findByUsername("usuario123");
     }
 
     @Test
     void validarCredenciales_Incorrectas_DeberiaRetornarFalse() {
-        // Arrange
         Usuario usuario = new Usuario("usuario123", "pass123", Set.of("ADMIN"));
         when(usuarioRepository.findByUsername("usuario123")).thenReturn(Optional.of(usuario));
 
-        // Act
         boolean resultado = usuarioService.validarCredenciales("usuario123", "wrongpass");
 
-        // Assert
         assertFalse(resultado);
         verify(usuarioRepository, times(1)).findByUsername("usuario123");
     }
 
     @Test
     void validarCredenciales_UsuarioNoExistente_DeberiaRetornarFalse() {
-        // Arrange
         when(usuarioRepository.findByUsername("inexistente")).thenReturn(Optional.empty());
 
-        // Act
         boolean resultado = usuarioService.validarCredenciales("inexistente", "pass123");
 
-        // Assert
         assertFalse(resultado);
         verify(usuarioRepository, times(1)).findByUsername("inexistente");
     }

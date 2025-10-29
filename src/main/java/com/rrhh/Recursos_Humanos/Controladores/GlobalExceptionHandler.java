@@ -8,10 +8,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    // Maneja errores de validación de @RequestBody con @Valid
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
-        // Tomamos solo el primer error
         String mensaje = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()

@@ -28,8 +28,8 @@ class DenunciaTest {
     @Test
     void descripcionNoDebeEstarVacia() {
         Denuncia denuncia = new Denuncia();
-        denuncia.setDescripcion(""); // inválido
-        denuncia.setEmpleado(new Empleado()); // se debe asignar un empleado para no fallar por nullable
+        denuncia.setDescripcion("");
+        denuncia.setEmpleado(new Empleado());
 
         Set<ConstraintViolation<Denuncia>> violaciones = validator.validate(denuncia);
 
@@ -43,7 +43,7 @@ class DenunciaTest {
     void descripcionValida_NoDebeTenerViolaciones() {
         Denuncia denuncia = new Denuncia();
         denuncia.setDescripcion("Uso indebido del celular");
-        denuncia.setEmpleado(new Empleado()); // se debe asignar un empleado para no fallar por nullable
+        denuncia.setEmpleado(new Empleado());
 
         Set<ConstraintViolation<Denuncia>> violaciones = validator.validate(denuncia);
 
@@ -53,14 +53,14 @@ class DenunciaTest {
     @Test
     void empleadoNoPuedeSerNull() {
         Denuncia denuncia = new Denuncia();
-        denuncia.setDescripcion("Llegó tarde"); // válido
-        denuncia.setEmpleado(null); // inválido
+        denuncia.setDescripcion("Llegó tarde");
+        denuncia.setEmpleado(null);
 
         Set<ConstraintViolation<Denuncia>> violaciones = validator.validate(denuncia);
 
         assertFalse(violaciones.isEmpty(), "El empleado no puede ser null");
         boolean contieneMensaje = violaciones.stream()
-                .anyMatch(v -> v.getMessage().contains("El empleado no puede ser null")); // JPA @ManyToOne genera este mensaje
+                .anyMatch(v -> v.getMessage().contains("El empleado no puede ser null"));
         assertTrue(contieneMensaje);
     }
 }

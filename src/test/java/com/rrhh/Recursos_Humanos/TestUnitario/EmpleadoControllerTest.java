@@ -91,17 +91,14 @@ public class EmpleadoControllerTest {
 
     @Test
     void actualizarEmpleado_NoExistente_DeberiaRetornar404() {
-        // Datos del empleado que enviaremos en el body
         Empleado empleadoActualizadoBody = new Empleado();
         empleadoActualizadoBody.setNombre("NoImporta");
 
         when(empleadoService.actualizarEmpleado(1L, empleadoActualizadoBody))
                 .thenThrow(new RuntimeException("Empleado no encontrado con id: 1"));
 
-        // Llamar al controlador
         ResponseEntity<?> response = empleadoController.actualizarEmpleado(1L, empleadoActualizadoBody);
 
-        // Verificar que el controlador manejó la excepción y la convirtió en 404
         assertEquals(404, response.getStatusCodeValue());
     }
 

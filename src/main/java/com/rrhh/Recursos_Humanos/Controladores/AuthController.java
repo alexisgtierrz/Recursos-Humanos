@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*") // permite llamadas desde tu HTML
+@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final AuthenticationManager authManager;
@@ -44,7 +44,6 @@ public class AuthController {
         private String usuario;
         private String password;
 
-        // --- AÑADE ESTOS MÉTODOS MANUALMENTE ---
         public String getUsuario() {
             return usuario;
         }
@@ -53,7 +52,6 @@ public class AuthController {
             return password;
         }
 
-        // (Opcional: añade setters si también los necesitas)
         public void setUsuario(String usuario) {
             this.usuario = usuario;
         }

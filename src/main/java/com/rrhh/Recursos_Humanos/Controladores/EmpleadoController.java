@@ -43,26 +43,21 @@ public class EmpleadoController {
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarEmpleado(@PathVariable Long id, @RequestBody Empleado empleado) {
         try {
-            // 1. Llama al servicio con AMBOS datos: el ID de la URL y el cuerpo del empleado
+            // Llama al servicio con AMBOS datos: el ID de la URL y el cuerpo del empleado
             // El servicio se encarga de buscar, validar y guardar.
             Empleado empleadoActualizado = empleadoService.actualizarEmpleado(id, empleado);
 
-            // 2. Si todo sale bien, devuelve 200 OK con el empleado actualizado
             return ResponseEntity.ok(empleadoActualizado);
 
         } catch (RuntimeException e) {
-            // 3. Captura la excepción "no encontrado" que lanza tu servicio
             if (e.getMessage().contains("Empleado no encontrado")) {
                 return ResponseEntity.notFound().build();
             }
 
-            // 4. Captura las excepciones de validación (DNI, email, etc. duplicados)
             if (e instanceof IllegalArgumentException) {
-                // Devuelve 400 Bad Request con el mensaje de error del servicio
                 return ResponseEntity.badRequest().body(e.getMessage());
             }
 
-            // 5. Para cualquier otro error inesperado
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno al actualizar el empleado");
         }
     }

@@ -1,4 +1,3 @@
-/* ======== ESTILOS GENERALES ======== */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -40,7 +39,7 @@ header nav .btn-red {
 
 main {
     padding: 20px;
-    padding-bottom: 60px;/* 👈 espacio para botones fijos */
+    padding-bottom: 60px;
 }
 
 
@@ -48,7 +47,6 @@ h2 {
     color: #004080;
 }
 
-/* ======== BOTONES ======== */
 .btn {
     background: #004080;
     color: white;
@@ -72,7 +70,6 @@ h2 {
     background: #ff3333;
 }
 
-/* ======== LOGIN ======== */
 .login-container {
     display: flex;
     justify-content: center;
@@ -117,7 +114,6 @@ input, select, textarea {
     margin-top: 5px;
 }
 
-/* ======== CARDS Y LISTAS ======== */
 .card {
     background: white;
     padding: 15px;
@@ -135,7 +131,6 @@ input, select, textarea {
     font-weight: bold;
 }
 
-/* ======== FORMULARIOS ======== */
 .form-container {
     background: white;
     padding: 20px;
@@ -151,21 +146,18 @@ input, select, textarea {
     margin-top: 15px;
 }
 
-/* ======== BUSCADOR ======== */
 .search-box {
     margin-bottom: 15px;
 }
 
-/* ======== BOTONES FIJOS ======== */
 .bottom-right {
-    position: static; /* elimina el fijo */
+    position: static;
     display: flex;
     justify-content: flex-end;
-    margin-top: 0px; /* separa del contenido */
+    margin-top: 0px;
 }
 
 
-/* ======== FOOTER ======== */
 footer {
     position: fixed;
     bottom: 0;
@@ -178,17 +170,15 @@ footer {
 }
 
 
-/*==============BOTON LADO BARRA====================*/
-
 .search-box {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* distribuye: izquierda / derecha */
+  justify-content: space-between;
 }
 
 .search-bar {
-  flex: 1; /* ocupa todo el espacio disponible */
-  max-width: 1400px; /* o el ancho que quieras */
+  flex: 1;
+  max-width: 1400px;
 }
 
 .bottom-right {
@@ -203,14 +193,12 @@ footer {
     text-align: center;
 }
 
-/* Clase para éxito */
 .mensaje-exito {
     background-color: #d4edda;
     color: #155724;
     border: 1px solid #c3e6cb;
 }
 
-/* Clase para error */
 .mensaje-error {
     background-color: #f8d7da;
     color: #721c24;
@@ -218,14 +206,14 @@ footer {
 }
 
 .modal {
-    position: fixed; /* Se queda fijo en la pantalla */
+    position: fixed;
     z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo negro semitransparente */
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -249,6 +237,6 @@ footer {
 .modal-acciones {
     margin-top: 20px;
     display: flex;
-    justify-content: flex-end; /* Alinea botones a la derecha */
-    gap: 10px; /* Espacio entre botones */
+    justify-content: flex-end;
+    gap: 10px;
 }

@@ -110,7 +110,6 @@ public class Empleado {
     public List<Denuncia> getDenuncias() { return denuncias; }
     public void setDenuncias(List<Denuncia> denuncias) { this.denuncias = denuncias; }
 
-    // 🔹 Helper para añadir denuncias
     public void addDenuncia(Denuncia denuncia) {
         denuncias.add(denuncia);
         denuncia.setEmpleado(this);

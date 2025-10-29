@@ -25,7 +25,7 @@ public class AuthControllerTest {
         authManager = mock(AuthenticationManager.class);
         usuarioService = mock(UsuarioService.class);
         authController = new AuthController(authManager);
-        authController.usuarioService = usuarioService; // inyectar mock manualmente
+        authController.usuarioService = usuarioService;
     }
 
     @Test

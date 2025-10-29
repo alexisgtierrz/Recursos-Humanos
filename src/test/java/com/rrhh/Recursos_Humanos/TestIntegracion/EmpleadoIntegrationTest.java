@@ -33,7 +33,6 @@ class EmpleadoIntegrationTest {
     @Autowired
     private PuestoRepository puestoRepository;
 
-    //Inyectamos EmpleadoRepository
     @Autowired
     private EmpleadoRepository empleadoRepository;
 
@@ -44,12 +43,9 @@ class EmpleadoIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        //Limpiamos la BD en orden
-        // Borramos empleados primero por la llave foránea
         empleadoRepository.deleteAll();
         puestoRepository.deleteAll();
 
-        // Creamos el puesto base para los tests
         puesto = new Puesto();
         puesto.setNombre("Desarrollador");
         puestoRepository.save(puesto);
@@ -80,7 +76,6 @@ class EmpleadoIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
     void testCrearEmpleado_conDniDuplicado_lanzaError() throws Exception {
-        // Creamos el primer empleado (directo por API)
         Empleado empleado1 = new Empleado();
         empleado1.setNombre("Carlos");
         empleado1.setApellido("Lopez");
@@ -97,7 +92,6 @@ class EmpleadoIntegrationTest {
                         .content(objectMapper.writeValueAsString(empleado1)))
                 .andExpect(status().isOk());
 
-        // Creamos el segundo empleado con el mismo DNI
         Empleado empleado2 = new Empleado();
         empleado2.setNombre("Enzo");
         empleado2.setApellido("Fernandez");
@@ -119,7 +113,6 @@ class EmpleadoIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
     void testGetTodosLosEmpleados() throws Exception {
-        // Arrange: Creamos un empleado de prueba en la BD
         Empleado empleado = new Empleado();
         empleado.setNombre("Ana");
         empleado.setApellido("Garcia");
@@ -131,7 +124,6 @@ class EmpleadoIntegrationTest {
         empleado.setSalario(120000.0);
         empleadoRepository.save(empleado);
 
-        // Act & Assert
         mockMvc.perform(get("/api/empleados"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1))) // Verifica que la lista tiene 1 elemento
@@ -141,7 +133,6 @@ class EmpleadoIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
     void testGetEmpleadoPorId_exitoso() throws Exception {
-        // Arrange: Creamos un empleado y guardamos su ID
         Empleado empleado = new Empleado();
         empleado.setNombre("Luis");
         empleado.setApellido("Martinez");
@@ -154,7 +145,6 @@ class EmpleadoIntegrationTest {
         Empleado empleadoGuardado = empleadoRepository.save(empleado);
         Long idGuardado = empleadoGuardado.getId();
 
-        // Act & Assert
         mockMvc.perform(get("/api/empleados/" + idGuardado))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(idGuardado.intValue())))
@@ -164,8 +154,7 @@ class EmpleadoIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
     void testGetEmpleadoPorId_noEncontrado() throws Exception {
-        // Act & Assert
-        // Hacemos un GET a un ID que sabemos que no existe
+
         mockMvc.perform(get("/api/empleados/9999"))
                 .andExpect(status().isNotFound());
     }
@@ -173,7 +162,6 @@ class EmpleadoIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
     void testActualizarEmpleado_exitoso() throws Exception {
-        // Arrange: Creamos un empleado base
         Empleado empleadoBase = new Empleado();
         empleadoBase.setNombre("Maria");
         empleadoBase.setApellido("Gomez");
@@ -186,18 +174,16 @@ class EmpleadoIntegrationTest {
         Empleado empleadoGuardado = empleadoRepository.save(empleadoBase);
         Long idGuardado = empleadoGuardado.getId();
 
-        // Creamos el objeto "actualizado" que enviaremos en el body
         Empleado empleadoActualizado = new Empleado();
         empleadoActualizado.setNombre("MariaActualizada");
-        empleadoActualizado.setApellido("Gomez"); // Mantenemos apellido
-        empleadoActualizado.setDni("12345678"); // Mantenemos DNI
+        empleadoActualizado.setApellido("Gomez");
+        empleadoActualizado.setDni("12345678");
         empleadoActualizado.setFechaNacimiento("04/04/1994");
         empleadoActualizado.setEmail("maria.actualizada@example.com"); // Email actualizado
         empleadoActualizado.setTelefono("3534123456");
         empleadoActualizado.setPuesto(puesto);
         empleadoActualizado.setSalario(110000.0); // Salario actualizado
 
-        // Act & Assert
         mockMvc.perform(put("/api/empleados/" + idGuardado)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -210,7 +196,6 @@ class EmpleadoIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
     void testBorrarEmpleado_exitoso() throws Exception {
-        // Arrange: Creamos un empleado para borrarlo
         Empleado empleadoParaBorrar = new Empleado();
         empleadoParaBorrar.setNombre("Pedro");
         empleadoParaBorrar.setApellido("Sanchez");
@@ -223,7 +208,6 @@ class EmpleadoIntegrationTest {
         Empleado empleadoGuardado = empleadoRepository.save(empleadoParaBorrar);
         Long idGuardado = empleadoGuardado.getId();
 
-        // Act & Assert
         mockMvc.perform(delete("/api/empleados/" + idGuardado)
                         .with(csrf()))
                 .andExpect(status().isOk());
@@ -232,10 +216,9 @@ class EmpleadoIntegrationTest {
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @Test
     void testCrearEmpleado_conDatosInvalidos_lanzaError400() throws Exception {
-        // Arrange: Creamos un empleado inválido (sin apellido)
         Empleado empleadoInvalido = new Empleado();
         empleadoInvalido.setNombre("Juan");
-        empleadoInvalido.setApellido(null); // <-- Esto debería fallar la validación
+        empleadoInvalido.setApellido(null);
         empleadoInvalido.setDni("12345678");
         empleadoInvalido.setFechaNacimiento("15/08/1999");
         empleadoInvalido.setEmail("juanperez@example.com");
@@ -243,7 +226,6 @@ class EmpleadoIntegrationTest {
         empleadoInvalido.setPuesto(puesto);
         empleadoInvalido.setSalario(150000.0);
 
-        // Act & Assert
         mockMvc.perform(post("/api/empleados")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)

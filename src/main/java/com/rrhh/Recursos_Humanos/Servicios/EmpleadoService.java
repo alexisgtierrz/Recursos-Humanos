@@ -45,29 +45,24 @@ public class EmpleadoService {
 
     public Empleado actualizarEmpleado(Long id, Empleado empleadoActualizado) {
 
-        // 1. Buscar al empleado original
         Empleado empleadoAActualizar = empleadoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado con id: " + id));
 
-        // 2. Validación de DNI
         Optional<Empleado> empleadoConMismoDni = empleadoRepository.findByDni(empleadoActualizado.getDni());
         if (empleadoConMismoDni.isPresent() && !empleadoConMismoDni.get().getId().equals(id)) {
             throw new IllegalArgumentException("Ya existe OTRO empleado con el DNI: " + empleadoActualizado.getDni());
         }
 
-        // --- 3. VALIDACIÓN FALTANTE DE EMAIL ---
         Optional<Empleado> empleadoConMismoEmail = empleadoRepository.findByEmail(empleadoActualizado.getEmail());
         if (empleadoConMismoEmail.isPresent() && !empleadoConMismoEmail.get().getId().equals(id)) {
             throw new IllegalArgumentException("Ya existe OTRO empleado con el email: " + empleadoActualizado.getEmail());
         }
 
-        // --- 4. VALIDACIÓN FALTANTE DE TELEFONO ---
         Optional<Empleado> empleadoConMismoTelefono = empleadoRepository.findByTelefono(empleadoActualizado.getTelefono());
         if (empleadoConMismoTelefono.isPresent() && !empleadoConMismoTelefono.get().getId().equals(id)) {
             throw new IllegalArgumentException("Ya existe OTRO empleado con el teléfono: " + empleadoActualizado.getTelefono());
         }
 
-        // 5. Si todo está bien, actualizar los campos
         empleadoAActualizar.setNombre(empleadoActualizado.getNombre());
         empleadoAActualizar.setApellido(empleadoActualizado.getApellido());
         empleadoAActualizar.setDni(empleadoActualizado.getDni());
@@ -76,7 +71,6 @@ public class EmpleadoService {
         empleadoAActualizar.setTelefono(empleadoActualizado.getTelefono());
         empleadoAActualizar.setPuesto(empleadoActualizado.getPuesto());
         empleadoAActualizar.setSalario(empleadoActualizado.getSalario());
-        // ... (asegúrate de que todos los campos estén aquí) ...
 
         return empleadoRepository.save(empleadoAActualizar);
     }

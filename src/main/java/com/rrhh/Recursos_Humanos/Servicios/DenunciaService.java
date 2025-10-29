@@ -25,7 +25,7 @@ public class DenunciaService {
 
         if (empleadoOpt.isPresent()) {
             Empleado empleado = empleadoOpt.get();
-            empleado.addDenuncia(denuncia); // helper de Empleado
+            empleado.addDenuncia(denuncia);
             return denunciaRepository.save(denuncia);
         } else {
             throw new RuntimeException("Empleado no encontrado con ID: " + empleadoId);
