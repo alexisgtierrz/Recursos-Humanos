@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar/Editar Personal - RRHH</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <p>SISTEMA DE RRHH</p>
+    <nav>
+        <a href="empleados.html">Gestión Empleados</a>
+        <a href="denuncias.html">Denuncias</a>
+        <div class="logout">
+        <button class="btn btn-red">Cerrar Sesión</button>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="form-container"> <div class="container"> <div id="mensaje-feedback" style="display: none;"></div>
+        <h2 id="tituloForm">Agregar Personal</h2>
+        <form id="empleadoForm">
+            <input type="hidden" id="empleadoId">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="nombre" required>
+            </div>
+            <div class="form-group">
+                <label>Apellido</label>
+                <input type="text" id="apellido" required>
+            </div>
+            <div class="form-group">
+                <label>Documento de Identidad</label>
+                <input type="text" id="dni" required>
+            </div>
+            <div class="form-group">
+                <label>Fecha de Nacimiento</label>
+                <input type="text" id="fechaNacimiento" placeholder="dd/MM/yyyy" maxlength="10" required>
+            </div>
+            <div class="form-group">
+                <label>E-Mail</label>
+                <input type="email" id="email" required>
+            </div>
+            <div class="form-group">
+                <label>Numero de Telefono</label>
+                <input type="text" id="telefono" required>
+            </div>
+            <div class="form-group">
+                <label>Puesto</label>
+                <select id="puesto" required></select>
+            </div>
+            <div class="form-group">
+                <label>Salario</label>
+                <input type="number" id="salario" required>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn">Guardar</button>
+                <a href="empleados.html" class="btn btn-red">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer>
+    <p>Todos los Derechos Reservados 2025 &copy;</p>
+</footer>
+
+<script>
+    const fechaInput = document.getElementById("fechaNacimiento");
+    fechaInput.addEventListener("input", (e) => {
+        let value = e.target.value.replace(/\D/g, "");
+        if (value.length > 2 && value.length <= 4) {
+            value = value.slice(0,2) + "/" + value.slice(2);
+        } else if (value.length > 4) {
+            value = value.slice(0,2) + "/" + value.slice(2,4) + "/" + value.slice(4,8);
+        }
+        e.target.value = value;
+    });
+
+    let empleadoId = sessionStorage.getItem("editarEmpleadoId");
+
+    async function cargarPuestos() {
+        try {
+            const response = await fetch("http://localhost:8080/api/puestos");
+            const puestos = await response.json();
+            const select = document.getElementById("puesto");
+            puestos.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p.id;
+                option.textContent = p.nombre;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error al cargar los puestos:", error);
+        }
+    }
+
+    async function cargarEmpleado(id) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/empleados/${id}`);
+            if (!response.ok) throw new Error("Empleado no encontrado");
+            const empleado = await response.json();
+
+            document.getElementById("tituloForm").textContent = "Editar Personal";
+            document.getElementById("empleadoId").value = empleado.id;
+            document.getElementById("nombre").value = empleado.nombre;
+            document.getElementById("apellido").value = empleado.apellido;
+            document.getElementById("dni").value = empleado.dni;
+            document.getElementById("fechaNacimiento").value = empleado.fechaNacimiento;
+            document.getElementById("email").value = empleado.email;
+            document.getElementById("telefono").value = empleado.telefono;
+            document.getElementById("puesto").value = empleado.puesto.id;
+            document.getElementById("salario").value = empleado.salario;
+        } catch (error) {
+            console.error("Error al cargar empleado:", error);
+
+            const mensajeDiv = document.getElementById("mensaje-feedback");
+            mensajeDiv.textContent = "No se pudo cargar el empleado. Error: " + error.message;
+            mensajeDiv.style.display = "block";
+            mensajeDiv.style.color = "red";
+            mensajeDiv.style.border = "1px solid red";
+            mensajeDiv.style.padding = "10px";
+            mensajeDiv.style.marginBottom = "10px";
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+        await cargarPuestos();
+        if (empleadoId) {
+            await cargarEmpleado(empleadoId);
+        }
+    });
+
+    document.getElementById("empleadoForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const mensajeDiv = document.getElementById("mensaje-feedback");
+        mensajeDiv.style.display = "none";
+
+        const empleado = {
+            nombre: document.getElementById("nombre").value,
+            apellido: document.getElementById("apellido").value,
+            dni: document.getElementById("dni").value,
+            fechaNacimiento: document.getElementById("fechaNacimiento").value,
+            email: document.getElementById("email").value,
+            telefono: document.getElementById("telefono").value,
+            puesto: { id: document.getElementById("puesto").value },
+            salario: parseFloat(document.getElementById("salario").value)
+        };
+
+        const url = empleadoId
+            ? `http://localhost:8080/api/empleados/${empleadoId}`
+            : "http://localhost:8080/api/empleados";
+        const method = empleadoId ? "PUT" : "POST";
+
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(empleado)
+            });
+
+            if (response.ok) {
+                mensajeDiv.textContent = "Empleado guardado correctamente";
+                mensajeDiv.style.color = "green";
+                mensajeDiv.style.border = "1px solid green";
+                mensajeDiv.style.padding = "10px";
+                mensajeDiv.style.marginBottom = "10px";
+                mensajeDiv.style.display = "block";
+
+                setTimeout(() => {
+                    sessionStorage.removeItem("editarEmpleadoId");
+                    window.location.href = "empleados.html";
+                }, 2000);
+
+            } else {
+                const error = await response.json();
+                mensajeDiv.textContent = "Error al guardar: " + (error.message || "Verifique los datos");
+                mensajeDiv.style.color = "red";
+                mensajeDiv.style.border = "1px solid red";
+                mensajeDiv.style.padding = "10px";
+                mensajeDiv.style.marginBottom = "10px";
+                mensajeDiv.style.display = "block";
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            mensajeDiv.textContent = "No se pudo conectar con el servidor. " + error.message;
+            mensajeDiv.style.color = "red";
+            mensajeDiv.style.border = "1px solid red";
+            mensajeDiv.style.padding = "10px";
+            mensajeDiv.style.marginBottom = "10px";
+            mensajeDiv.style.display = "block";
+        }
+    });
+
+    document.querySelector(".logout .btn-red").addEventListener("click", function() {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    });
+</script>
+</body>
+</html>

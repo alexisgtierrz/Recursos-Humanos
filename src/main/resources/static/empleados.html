@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleados - RRHH</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <p>SISTEMA DE RRHH</p>
+    <nav>
+        <a href="empleados.html">Gestión de Empleados</a>
+        <a href="denuncias.html">Denuncias</a>
+
+        <div class="logout">
+            <button class="btn btn-red">Cerrar Sesión</button>
+        </div>
+    </nav>
+
+
+</header>
+
+<main>
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Buscar empleado..." class="search-bar">
+        <div class="bottom-right">
+            <a href="agregar_empleado.html" class="btn" id="btnAgregar">Agregar Empleado</a>
+        </div>
+    </div>
+
+    <div id="mensaje-feedback" style="display: none;"></div>
+
+    <div id="confirmarModal" class="modal" style="display: none;">
+        <div class="modal-contenido">
+            <h4>Confirmar Eliminación</h4>
+            <p>¿Seguro que quieres eliminar este empleado?</p>
+            <div class="modal-acciones">
+                <button id="btnConfirmarEliminar" class="btn btn-red">Eliminar</button>
+                <button id="btnCancelarEliminar" class="btn">Cancelar</button>
+            </div>
+        </div>
+    </div> <div id="empleados-list"></div>
+
+</main>
+
+
+
+<footer>
+    <p>Todos los Derechos Reservados 2025 &copy;</p>
+</footer>
+
+<script>
+    let empleadosGlobal = [];
+
+    const mensajeDiv = document.getElementById("mensaje-feedback");
+    const modal = document.getElementById("confirmarModal");
+    const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
+    const btnCancelarEliminar = document.getElementById("btnCancelarEliminar");
+
+    function mostrarMensaje(texto, tipo = "exito") {
+        mensajeDiv.textContent = texto;
+        mensajeDiv.className = tipo === "exito" ? "mensaje-exito" : "mensaje-error";
+        mensajeDiv.style.display = "block";
+
+        if (tipo === "exito") {
+            setTimeout(() => {
+                mensajeDiv.style.display = "none";
+            }, 3000);
+        }
+    }
+
+    function fetchEmpleados() {
+        fetch("http://localhost:8080/api/empleados", {
+            headers: {
+                "Authorization": "Basic " + btoa("admin:Password123")
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                empleadosGlobal = data;
+                renderEmpleados(data);
+            })
+            .catch(err => {
+                console.error("Error cargando empleados:", err);
+                mostrarMensaje("Error al cargar la lista de empleados.", "error");
+            });
+    }
+
+    function renderEmpleados(empleados) {
+        const contenedor = document.getElementById("empleados-list");
+        contenedor.innerHTML = "";
+
+        if (empleados.length === 0) {
+            contenedor.innerHTML = "<p>No se encontraron empleados.</p>";
+            return;
+        }
+
+        empleados.forEach(emp => {
+            const card = document.createElement("div");
+            card.classList.add("card");
+
+            card.innerHTML = `
+                <div>
+                    <strong>${emp.nombre} ${emp.apellido}</strong><br>
+                    DNI: ${emp.dni}<br>
+                    Fecha Nacimiento: ${emp.fechaNacimiento}<br>
+                    Email: ${emp.email}<br>
+                    Teléfono: ${emp.telefono}<br>
+                    Puesto: ${emp.puesto ? emp.puesto.nombre : "Sin asignar"}<br>
+                    Salario: $${emp.salario}
+                </div>
+                <div class="actions">
+                    <button class="editar" data-id="${emp.id}">✏️</button>
+                    <button class="eliminar" data-id="${emp.id}">🗑️</button>
+                </div>
+            `;
+
+            contenedor.appendChild(card);
+        });
+
+        document.querySelectorAll(".editar").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const id = this.getAttribute("data-id");
+                sessionStorage.setItem("editarEmpleadoId", id);
+                window.location.href = "agregar_empleado.html";
+            });
+        });
+
+        document.querySelectorAll(".eliminar").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const id = this.getAttribute("data-id");
+                btnConfirmarEliminar.dataset.idParaEliminar = id;
+                modal.style.display = "flex";
+            });
+        });
+    }
+
+
+    btnCancelarEliminar.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    btnConfirmarEliminar.addEventListener("click", async function() {
+        const id = this.dataset.idParaEliminar;
+        modal.style.display = "none";
+
+        mensajeDiv.style.display = "none";
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/empleados/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": "Basic " + btoa("admin:Password123")
+                }
+            });
+            if (response.ok) {
+                mostrarMensaje("Empleado eliminado correctamente ✅");
+                fetchEmpleados();
+            } else {
+                mostrarMensaje("Error al eliminar el empleado", "error");
+            }
+        } catch (error) {
+            console.error(error);
+            mostrarMensaje("No se pudo conectar con el servidor.", "error");
+        }
+    });
+
+
+    document.getElementById("searchInput").addEventListener("input", function() {
+        const filtro = this.value.toLowerCase();
+        const filtrados = empleadosGlobal.filter(emp =>
+            `${emp.nombre} ${emp.apellido}`.toLowerCase().includes(filtro)
+        );
+        renderEmpleados(filtrados);
+    });
+
+    document.querySelector(".logout .btn-red").addEventListener("click", function() {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "index.html";
+    });
+
+    const btnAgregar = document.getElementById("btnAgregar");
+    if (btnAgregar) {
+        btnAgregar.addEventListener("click", () => {
+            sessionStorage.removeItem("editarEmpleadoId");
+        });
+    }
+
+    fetchEmpleados();
+</script>
+</body>
+</html>

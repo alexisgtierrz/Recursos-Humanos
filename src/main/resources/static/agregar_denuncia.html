@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Denuncia - RRHH</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <p>SISTEMA DE RRHH</p>
+    <nav>
+        <a href="empleados.html">Gestión Empleados</a>
+        <a href="denuncias.html">Denuncias</a>
+        <div class="logout">
+            <button class="btn btn-red">Cerrar Sesión</button>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="form-container">
+
+        <div id="mensaje-feedback" style="display: none;"></div>
+
+        <h2>Agregar Denuncia</h2>
+        <form id="denunciaForm">
+            <label for="puestos">Puesto</label>
+            <select id="puestos" required>
+                <option value="" disabled selected>--Seleccione--</option>
+            </select>
+
+            <label for="empleados">Empleados</label>
+            <select id="empleados" required>
+                <option value="" disabled selected>--Seleccione--</option>
+            </select>
+
+            <div class="form-group">
+                <label for="motivo">Motivo:</label>
+                <textarea id="motivo" required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn">Guardar</button>
+                <a href="denuncias.html" class="btn btn-red">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer>
+    <p>Todos los Derechos Reservados 2025 &copy;</p>
+</footer>
+
+<script>
+    const puestosSelect = document.getElementById("puestos");
+    const empleadosSelect = document.getElementById("empleados");
+    const form = document.getElementById("denunciaForm");
+
+    const mensajeDiv = document.getElementById("mensaje-feedback");
+
+    function mostrarMensaje(texto, tipo = "error") {
+        mensajeDiv.textContent = texto;
+        mensajeDiv.style.color = (tipo === "exito") ? "green" : "red";
+        mensajeDiv.style.border = (tipo === "exito") ? "1px solid green" : "1px solid red";
+        mensajeDiv.style.padding = "10px";
+        mensajeDiv.style.marginBottom = "15px";
+        mensajeDiv.style.borderRadius = "5px";
+        mensajeDiv.style.display = "block";
+    }
+
+    async function fetchPuestos() {
+        try {
+            const res = await fetch("http://localhost:8080/api/puestos");
+            const puestos = await res.json();
+            puestos.forEach(p => {
+                const option = document.createElement("option");
+                option.value = p.id;
+                option.textContent = p.nombre;
+                puestosSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error cargando puestos:", error);
+            mostrarMensaje("Error al cargar la lista de puestos.", "error");
+        }
+    }
+
+    // Traer empleados filtrados por puesto
+    async function fetchEmpleados(puestoId) {
+        try {
+            empleadosSelect.innerHTML = '<option value="" disabled selected>--Seleccione--</option>';
+            const res = await fetch(`http://localhost:8080/api/empleados/puesto/${puestoId}`);
+            const empleados = await res.json();
+            empleados.forEach(e => {
+                const option = document.createElement("option");
+                option.value = e.id;
+                option.textContent = `${e.nombre} ${e.apellido}`;
+                empleadosSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error cargando empleados:", error);
+            mostrarMensaje("Error al cargar los empleados de ese puesto.", "error");
+        }
+    }
+
+    puestosSelect.addEventListener("change", (e) => {
+        mensajeDiv.style.display = "none";
+        const puestoId = e.target.value;
+        if (puestoId) fetchEmpleados(puestoId);
+    });
+
+    // Enviar formulario
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        mensajeDiv.style.display = "none";
+
+        const empleadoId = empleadosSelect.value;
+        const descripcion = document.getElementById("motivo").value;
+
+        try {
+            const res = await fetch(`http://localhost:8080/api/denuncias/empleado/${empleadoId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ descripcion})
+            });
+            if (res.ok) {
+                mostrarMensaje("Denuncia agregada correctamente", "exito");
+                setTimeout(() => {
+                    window.location.href = "denuncias.html";
+                }, 2000);
+            } else {
+                mostrarMensaje("Error al agregar denuncia", "error");
+            }
+        } catch (error) {
+            console.error("Error al guardar denuncia:", error);
+            mostrarMensaje("No se pudo conectar con el servidor.", "error");
+        }
+    });
+
+    fetchPuestos();
+</script>
+</body>
+</html>
